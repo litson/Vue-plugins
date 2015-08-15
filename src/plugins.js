@@ -1,3 +1,14 @@
+/**
+ * @file
+ * @fileoverview
+ * @authors
+ * @date
+ * @version
+ * @note
+ */
+
+/* global Vue */
+;
 (function () {
 
     var extend = Vue.util.extend;
@@ -26,7 +37,7 @@
      * @param elements
      * @returns {string}
      */
-    function param(elements, excepts) {
+    function param(elements) {
 
         var result = [];
 
@@ -34,12 +45,14 @@
 
             /*
              *
-             * 支持：
+             * E.g:
+             *
+             * 支持函数表达式传值：
+             *
              *      var i = 0;
              *
-             *      data: {
-             *                 param1: function(){ return i++ }
-             *            }
+             *      Vue.util.param( { field: function (){ return ++i; } } );
+             *      // output: field=1
              *
              */
             if (type(item) === 'function') {
@@ -59,7 +72,7 @@
     function ajax(options) {
 
         var defaultOptions = {
-            type: 'get',
+            type: 'GET',
             url: window.location.toString(),
             data: '',
             dataType: 'json',
@@ -72,6 +85,9 @@
         }
 
         options = extend(defaultOptions, options || {});
+
+
+
 
         console.log(options);
 
