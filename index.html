@@ -6,10 +6,50 @@
     <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
     <title>Test Bed</title>
     <link rel="stylesheet" href="//cdn.bootcss.com/bootstrap/3.3.5/css/bootstrap.css"/>
+    <style>
+        .wrapper {
+            max-width: 640px;
+            overflow-y: hidden;
+            margin: 4rem auto 1rem;
+        }
+    </style>
 </head>
 <body>
 
-<script src="//cdn.bootcss.com/vue/0.12.10/vue.js"></script>
+<div class="wrapper">
+    <table class="table table-bordered table-striped">
+        <tr v-repeat="item : items">
+            <td class="text-right">
+                <strong>{{$key}}:</strong>
+            </td>
+            <td> {{item}}</td>
+        </tr>
+
+    </table>
+</div>
+
+<script src="https://www.baifubao.com/static/group/js/mobile/inline/vue.js"></script>
 <script src="src/plugins.js"></script>
+<script>
+
+    // "//cdn.bootcss.com/vue/0.12.10/vue.js"
+
+    !function (WIN, Vue) {
+
+        Vue.config.debug = true;
+
+        var vm = new Vue({
+            el: 'body',
+            data: {
+                items: Vue.util
+            }
+        });
+
+        WIN.globalVM = vm;
+
+    }(window, Vue);
+
+
+</script>
 </body>
 </html>

@@ -1,20 +1,22 @@
 /**
  * @file
- * @fileoverview
- * @authors
- * @date
- * @version
+ * @fileoverview Vue plugins
+ * @authors      litson.zhang@gmail.com
+ * @date         2015.08.18
+ * @version      1.0
  * @note
  */
 
 /* global Vue */
 ;
-(function () {
+(function (Vue) {
 
     var extend = Vue.util.extend;
 
     /**
      * ref: http://devdocs.io/javascript/global_objects/array/foreach
+     *
+     * The each() method executes a provided function once per array or object literal element.
      *
      * @param elements
      * @param callBack
@@ -69,6 +71,22 @@
 
     }
 
+    /**
+     *
+     * @param options
+     *
+     * Defaults:
+     *  { }
+     *
+     *      type: 'GET'
+     *      url : location.toString()
+     *      data: ''
+     *      dataType: 'json'
+     *      context : null
+     *
+     *
+     *
+     */
     function ajax(options) {
 
         var defaultOptions = {
@@ -85,8 +103,6 @@
         }
 
         options = extend(defaultOptions, options || {});
-
-
 
 
         console.log(options);
@@ -110,7 +126,8 @@
 
 
     /**
-     * 序列化数据
+     * Serialize data to string.
+     *
      * @param options
      */
     function serializeData(options) {
@@ -128,16 +145,17 @@
 
     /**
      * url后附加query string
+     *
      * @param url
      * @param query
-     * @returns {*}
+     * @returns {string}
      */
     function appendQuery(url, query) {
         return (query === '') ? url : (url + '&' + query).replace(/[&?]{1,2}/, '?');
     }
 
     /**
-     * 获取数据类型
+     * Get data type
      * @param object
      * @returns {string}
      */
@@ -146,4 +164,4 @@
     }
 
 
-})();
+})(Vue);
