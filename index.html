@@ -17,12 +17,18 @@
 <body>
 
 <div class="wrapper">
+
+    <a href="#nogo" class="btn" v-on="click : getData">Get Data</a>
+
+    <p>
+        JSON: {{msg}}
+    </p>
     <table class="table table-bordered table-striped" width="100%">
         <tr v-repeat="item : items">
             <td class="text-right">
                 <strong>{{$key}}:</strong>
             </td>
-            <td> {{*item}}</td>
+            <td> {{item}}</td>
         </tr>
 
     </table>
@@ -43,17 +49,42 @@
 
         Vue.config.debug = true;
 
+        var data = {
+            // items: Vue.util
+            items: {
+                testBbject: 1,
+
+
+            },
+            test2: [1, 3, 4]
+            //,
+            // msg:1
+        };
+
+
         var vm = new Vue({
             el: '.wrapper',
-            data: {
-                // items: Vue.util
-                items: {
-                    test: 1
+            data: data,
+            methods: {
+                getData: function () {
+
+                    Vue.ajax({
+                        url: 'http://localhost:63342/GITHUB/Vue-plugins/test-bed/test-datas.json',
+                        data: this.$data,
+                        success: function (ajaxData) {
+
+                            console.log(ajaxData, 'ajaxData');
+                            vm.$data.$add('msg', ajaxData.msg);
+
+                        }
+                    });
+
                 }
             }
         });
 
         WIN.globalVM = vm;
+
 
     }(window, Vue);
 
