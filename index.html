@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="//cdn.bootcss.com/bootstrap/3.3.5/css/bootstrap.css"/>
     <style>
         .wrapper {
-            max-width: 640px;
+            max-width: 960px;
             overflow-y: hidden;
             margin: 4rem auto 1rem;
         }
@@ -17,31 +17,39 @@
 <body>
 
 <div class="wrapper">
-    <table class="table table-bordered table-striped">
+    <table class="table table-bordered table-striped" width="100%">
         <tr v-repeat="item : items">
             <td class="text-right">
                 <strong>{{$key}}:</strong>
             </td>
-            <td> {{item}}</td>
+            <td> {{*item}}</td>
         </tr>
 
     </table>
 </div>
 
-<script src="https://www.baifubao.com/static/group/js/mobile/inline/vue.js"></script>
+<script src="//cdn.bootcss.com/vue/0.12.10/vue.js"></script>
 <script src="src/plugins.js"></script>
 <script>
 
-    // "//cdn.bootcss.com/vue/0.12.10/vue.js"
+    // 0.12.* 以后的版本 无法输出Vue.util
+    // cdn.bootcss.com/vue/0.12.10/vue.js
+    // <script src="//cdn.bootcss.com/vue/0.11.10/vue.js"></ script>
 
     !function (WIN, Vue) {
+
+
+        // TODO: Vue.ajax + components.async @v 0.12.*
 
         Vue.config.debug = true;
 
         var vm = new Vue({
-            el: 'body',
+            el: '.wrapper',
             data: {
-                items: Vue.util
+                // items: Vue.util
+                items: {
+                    test: 1
+                }
             }
         });
 
