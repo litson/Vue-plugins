@@ -35,6 +35,7 @@
 </div>
 
 <script src="//cdn.bootcss.com/vue/0.12.10/vue.js"></script>
+<script src="//cdn.bootcss.com/zepto/1.1.6/zepto.js"></script>
 <script src="src/plugins.js"></script>
 <script>
 
@@ -52,14 +53,15 @@
         var data = {
             // items: Vue.util
             items: {
-                testBbject: 1,
-
-
+                testBbject: 1
             },
             test2: [1, 3, 4]
             //,
             // msg:1
         };
+
+        console.log(decodeURIComponent($.param(data)));
+        console.log(decodeURIComponent(Vue.util.param(data)));
 
 
         var vm = new Vue({

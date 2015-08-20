@@ -1,0 +1,14 @@
+{
+  "name": "Vue-plugins",
+  "version": "1.0.0",
+  "main": "src/plugins.js",
+  "devDependencies": {
+    "gulp": "latest",
+    "gulp-watch": "latest",
+    "gulp-concat-util": "latest",
+    "gulp-sourcemaps": "latest",
+    "gulp-jshint": "latest",
+    "gulp-uglify": "latest",
+    "gulp-size": "latest"
+  }
+}

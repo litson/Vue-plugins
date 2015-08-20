@@ -33,89 +33,115 @@
 
     }
 
+
     /**
-     * Serialize form elements
+     *
+     * 序列化参数
      *
      * @param elements
+     * @param traditional
      * @returns {string}
      */
-    function param(elements) {
+    function param(elements, traditional) {
 
         var result = [];
-        var dataType;
 
-        Vue.util.each(elements, function (item, key) {
+        result.add = function (item, key) {
 
-            dataType = type(item);
-
-            /*
-             *
-             * E.g:
-             *
-             * 支持函数表达式传值：
-             *
-             *      var i = 0;
-             *
-             *      Vue.util.param( { field: function (){ return ++i; } } );
-             *      // output: field=1
-             *
-             */
-            if ('function' === dataType) {
+            // If value is a function, invoke it and return its value
+            if ('function' === type(item)) {
                 item = item();
-                dataType = type(item);
             }
 
-            if (item == null) {
+            if (null == item) {
                 item = '';
             }
 
+            result[result.length] = encodeURIComponent(key) + '=' + encodeURIComponent(item);
+
+        };
+
+        // http://www.w3school.com.cn/jquery/ajax_param.asp
+        _buildParam(result, elements, traditional);
+
+        return result.join('&').replace(/%20/g, '+');
+
+    }
+
+
+    /**
+     *
+     * 处理多纬数组
+     *
+     * E.g
+     *
+     * var params = {
+     *
+     *      items: {  testBbject: 1 },
+     *      test2: [1, 2, 3]
+     *
+     * }
+     *
+     * Use jQuery or Zepto:
+     *      decodeURIComponent( $.param( params ) );
+     *      // output: items[testBbject]=1&test2[]=1&test2[]=3&test2[]=4
+     *
+     *
+     * Use Vue.util.param
+     *      decodeURIComponent( Vue.util.param( params ) );
+     *      // output: items[testBbject]=1&test2[]=1&test2[]=3&test2[]=4
+     *
+     *
+     *
+     *
+     * @param params
+     * @param elements
+     * @param traditional
+     * @param prefix
+     * @private
+     */
+    function _buildParam(params, elements, traditional, prefix) {
+
+        var dataType = type(elements);
+        var isPlainObject = 'object' === dataType;
+
+        Vue.util.each(elements, function (item, key) {
+
+            var _type = type(item);
+            var _isPlainObject = 'object' === _type;
+            var _isArray = 'array' === _type;
+
+            if (prefix) {
+
+                if (traditional) {
+                    key = prefix;
+                } else {
+                    key = [
+
+                        prefix
+                        , '['
+                        , (isPlainObject || _isPlainObject || _isArray) ? key : ''
+                        , ']'
+
+
+                    ].join('');
+                }
+            }
+
             /**
-             *
-             * E.g:
-             *
-             * transform:
-             *      {
-             *          a: { a1:1 },
-             *          b: [1, 3, 5]
-             *      }
-             *
-             * to:
-             *      a[a1]=1&b[]=1&b[]=3&b[]=5
-             *
+             * 因为这里不需要对form DOM 做扫描
+             * 所以和 $.param 不同的是，去掉了 serializeArray 的format
              */
-            if ('object' === dataType || 'array' === dataType) {
-
-                Vue.util.each(item, function (_item, _key) {
-
-                    _key = [key, '[', _key, ']'].join('');
-
-                    //result.push(
-                    //    encodeURIComponent(_key) + '=' + encodeURIComponent(_item)
-                    //);
-
-                    result.push(
-                        _key + '=' + _item
-                    );
-
-                });
-
+            if (_isArray || (!traditional && _isPlainObject)) {
+                _buildParam(params, item, traditional, key);
             } else {
-
-                //result.push(
-                //    encodeURIComponent(key) + '=' + encodeURIComponent(item)
-                //);
-
-                result.push(
-                    key + '=' + item
-                );
-
+                params.add(item, key);
             }
 
         });
 
-        return result.join('&');
-
     }
+
 
     /**
      *
@@ -187,12 +213,18 @@
 
         // TODO: Ajax.cache
         if (options.cache) {
-            Vue.util.warn('暂不支持绕过缓存噢~');
+            Vue.util.log('暂不支持绕过缓存噢~');
         }
 
 
         // 不走 xhr + eval 的加载脚本方式，改为外联。保证没有跨域问题,而且性能上成
         if ('script' === dataType) {
+
+            Vue.util.log('暂不支持 type = "script" 奥~');
+
+            return null;
+
+
             return Vue.util.loadFile(options.url, function () {
                 _ajaxHelpers.success(null, null, options);
             }, function (event) {
@@ -240,7 +272,7 @@
 
         // TODO: Ajax.timeout
         if (options.timeout) {
-            Vue.util.warn('暂不支持超时噢~');
+            Vue.util.log('暂不支持超时噢~');
         }
 
         xhr.send(options.data);
@@ -309,6 +341,10 @@
      */
     function loadFile(filelist) {
 
+
+
+
+
     }
 
 
@@ -317,7 +353,7 @@
     Vue.util.each = each;
     Vue.util.param = param;
     Vue.util.NOOP = noop;
-    Vue.util.loadFile = loadFile;
+    // Vue.util.loadFile = loadFile;
 
     Vue.ajax = Vue.util.ajax = ajax;
 
