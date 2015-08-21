@@ -36,8 +36,14 @@
 
 <script src="//cdn.bootcss.com/vue/0.12.10/vue.js"></script>
 <script src="//cdn.bootcss.com/zepto/1.1.6/zepto.js"></script>
-<script src="src/plugins.js"></script>
+<script src="dist/plugins.js"></script>
 <script>
+
+
+    Vue.ready(function (Vue) {
+        console.log('Ready!', Vue);
+    });
+
 
     // 0.12.* 以后的版本 无法输出Vue.util
     // cdn.bootcss.com/vue/0.12.10/vue.js
@@ -63,6 +69,16 @@
         console.log(decodeURIComponent($.param(data)));
         console.log(decodeURIComponent(Vue.util.param(data)));
 
+        var url = 'http://localhost:63342/GITHUB/Vue-plugins/test-bed/test-datas.json';
+
+        function __callBack(ajaxData) {
+            console.log(ajaxData, 'ajaxData');
+            vm.$data.$add('msg', ajaxData.msg);
+        }
+
+
+        Vue.get(url, data, __callBack);
+
 
         var vm = new Vue({
             el: '.wrapper',
@@ -71,17 +87,12 @@
                 getData: function () {
 
                     Vue.ajax({
-                        url: 'http://localhost:63342/GITHUB/Vue-plugins/test-bed/test-datas.json',
+                        url: url,
                         data: this.$data,
-                        success: function (ajaxData) {
-
-                            console.log(ajaxData, 'ajaxData');
-                            vm.$data.$add('msg', ajaxData.msg);
-
-                        }
+                        success: __callBack
                     });
-
                 }
+
             }
         });
 

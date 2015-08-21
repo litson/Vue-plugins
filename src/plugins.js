@@ -18,21 +18,27 @@
      *
      * The each() method executes a provided function once per array or object literal element.
      *
+     * 原生 forEach 在 return false 后会自动 break,这里对象字面量的循环延续该特性.
+     *
      * @param elements
      * @param callBack
      */
     function each(elements, callBack) {
+        if (!elements) {
+            return;
+        }
 
         if (elements.forEach) {
             return elements.forEach(callBack);
         }
 
         for (var key in elements) {
-            callBack(elements[key], key, elements);
+            if (elements.hasOwnProperty(key) && callBack(elements[key], key, elements) === false) {
+                break;
+            }
         }
 
     }
-
 
     /**
      *
@@ -68,7 +74,6 @@
 
     }
 
-
     /**
      *
      * 处理多纬数组
@@ -102,8 +107,7 @@
      */
     function _buildParam(params, elements, traditional, prefix) {
 
-        var dataType = type(elements);
-        var isPlainObject = 'object' === dataType;
+        var isPlainObject = 'object' === type(elements);
 
         Vue.util.each(elements, function (item, key) {
 
@@ -142,6 +146,31 @@
 
     }
 
+    // Vue Ajax Default Options.
+    Vue.ajaxSettings = {
+        type: 'GET',
+        url: location.href,
+
+        data: '',
+        dataType: 'json',
+        cache: false,
+
+        async: true,
+        username: null,
+        password: null,
+
+        context: null,
+        timeout: 0,
+
+        xhr: function () {
+            return new window.XMLHttpRequest()
+        },
+
+        beforeSend: noop,
+        complete: noop,
+        success: noop,
+        error: noop
+    };
 
     /**
      *
@@ -152,44 +181,8 @@
      *
      *
      * @param options
-     *
-     * Defaults:
-     *  { }
-     *
-     *      type: 'GET'
-     *      url : location.toString()
-     *      data: ''
-     *      dataType: 'json'
-     *      context : null
-     *
-     *
-     *
      */
     function ajax(options) {
-
-        var defaultOptions = {
-            type: 'GET',
-            url: location.href,
-
-            data: '',
-            dataType: 'json',
-            cache: false,
-
-            async: true,
-            username: null,
-            password: null,
-
-            context: null,
-            timeout: 0,
-
-            xhr: function () {
-                return new window.XMLHttpRequest()
-            },
-
-            success: Vue.util.NOOP,
-            error: Vue.util.NOOP
-
-        };
 
         var hashIndex;
         var dataType;
@@ -197,7 +190,13 @@
 
         var blankRE = /^\s*$/;
 
-        options = extend(defaultOptions, options || {});
+        Vue.util.each(Vue.ajaxSettings, function (item, key) {
+
+            if (options[key] === undefined) {
+                options[key] = item;
+            }
+
+        });
 
         // 过滤掉hash
         hashIndex = options.url.indexOf('#');
@@ -224,12 +223,11 @@
 
             return null;
 
-
-            return Vue.util.loadFile(options.url, function () {
-                _ajaxHelpers.success(null, null, options);
-            }, function (event) {
-                _ajaxHelpers.error(event, 'error', null, options);
-            });
+            //return Vue.util.loadFile(options.url, function () {
+            //    _ajaxHelpers.success(null, null, options);
+            //}, function (event) {
+            //    _ajaxHelpers.error(event, 'error', null, options);
+            //});
         }
 
         // xhr 实例
@@ -247,11 +245,16 @@
 
                     result = xhr.responseText;
 
-                    try {
-                        result = blankRE.test(result) ? null : JSON.parse(result);
-                    } catch (ex) {
-                        error = ex;
+                    if ('json' === dataType) {
+
+                        try {
+                            result = blankRE.test(result) ? null : JSON.parse(result + '');
+                        } catch (ex) {
+                            error = ex;
+                        }
+
                     }
+
 
                     if (error) {
                         _ajaxHelpers.error(error, 'parsererror', xhr, options);
@@ -277,8 +280,8 @@
 
         xhr.send(options.data);
 
+        return xhr;
     }
-
 
     var _ajaxHelpers = {
         error: function (error, type, xhr, options) {
@@ -291,13 +294,82 @@
         }
     }
 
+    /**
+     *
+     *
+     * Ajax, method 'get'.
+     *
+     * Vue.get( url [, data ] [, success(data, textStatus, jqXHR) ] [, dataType ] )
+     *
+     * @param url
+     * @param data
+     * @param success
+     * @param dataType
+     */
+    function ajaxGet(/* url, data, success, dataType */) {
+        return Vue.ajax(_paramParser.apply(null, arguments));
+    }
+
+    /**
+     *
+     * Ajax, method 'post'.
+     *
+     * Vue.post( url [, data ] [, success(data, textStatus, jqXHR) ] [, dataType ] )
+     *
+     * @param url
+     * @param data
+     * @param success
+     * @param dataType
+     */
+    function ajaxPost(/* url, data, success, dataType */) {
+        var options = _paramParser.apply(null, arguments);
+        options.type = 'post';
+        return Vue.ajax(options);
+    }
+
+    /**
+     *
+     * override
+     *
+     * @param url
+     * @param data
+     * @param success
+     * @param dataType
+     * @returns {{XMLHttpRequest}}
+     * @private
+     */
+    function _paramParser(url, data, success, dataType) {
+
+        if ('function' === type(data)) {
+
+            dataType = success;
+            success = data;
+            data = undefined;
+
+        }
+
+        if ('function' !== type(success)) {
+
+            dataType = success;
+            success = undefined;
+
+        }
+
+
+        return {
+            url: url,
+            data: data,
+            success: success,
+            dataType: dataType
+        }
+
+    }
 
     /**
      * Do nothing.
      */
     function noop() {
     }
-
 
     /**
      *
@@ -342,23 +414,18 @@
     function loadFile(filelist) {
 
 
-
-
-
     }
 
-
-    // ==================== Bind to global Vue ==================== //
-
-    Vue.util.each = each;
-    Vue.util.param = param;
-    Vue.util.NOOP = noop;
-    // Vue.util.loadFile = loadFile;
-
-    Vue.ajax = Vue.util.ajax = ajax;
+    /**
+     * Get data type
+     * @param object
+     * @returns {string}
+     */
+    function type(object) {
+        return Object.prototype.toString.call(object).replace(/\[\object|\]|\s/gi, '').toLowerCase();
+    }
 
     // ==================== helpers ====================
-
 
     /**
      * Serialize data to string.
@@ -367,11 +434,11 @@
      */
     function serializeData(options) {
 
-        if (type(options.data) !== 'string') {
+        if (options.data && type(options.data) !== 'string') {
             options.data = Vue.util.param(options.data);
         }
 
-        if (options.type.toLocaleLowerCase() === 'get') {
+        if (options.data && options.type.toLocaleLowerCase() === 'get') {
             options.url = appendQuery(options.url, options.data);
             options.data = undefined;
         }
@@ -389,15 +456,23 @@
         return (query === '') ? url : (url + '&' + query).replace(/[&?]{1,2}/, '?');
     }
 
-    /**
-     * Get data type
-     * @param object
-     * @returns {string}
-     */
-    function type(object) {
-        return Object.prototype.toString.call(object).replace(/\[\object|\]|\s/gi, '').toLowerCase();
-    }
 
+    // ==================== Bind to global Vue ==================== //
+
+    extend(Vue.util, {
+
+        each: each,
+        param: param,
+        type: type,
+        NOOP: noop
+
+    });
+
+    Vue.ajax = ajax;
+    Vue.get = ajaxGet;
+    Vue.post = ajaxPost;
+
+    // Vue.util.loadFile = loadFile;
 
 })(Vue);
 
