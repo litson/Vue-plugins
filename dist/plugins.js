@@ -249,13 +249,15 @@
 
         var blankRE = /^\s*$/;
 
-        Vue.util.each(Vue.ajaxSettings, function (item, key) {
+        //Vue.util.each(Vue.ajaxSettings, function (item, key) {
+        //
+        //    if (options[key] === undefined) {
+        //        options[key] = item;
+        //    }
+        //
+        //});
 
-            if (options[key] === undefined) {
-                options[key] = item;
-            }
-
-        });
+        _mergeExceptUndefined(Vue.ajaxSettings, options);
 
         // 过滤掉hash
         hashIndex = options.url.indexOf('#');
@@ -351,6 +353,17 @@
             var context = options.context;
             options.success.call(context, data, 'success', xhr);
         }
+    }
+
+
+    function _mergeExceptUndefined(from, to) {
+        Vue.util.each(from, function (item, key) {
+
+            if (to[key] === undefined) {
+                to[key] = item;
+            }
+
+        });
     }
 
     /**
@@ -472,8 +485,66 @@
      */
     function loadFile(filelist) {
 
+        var dataType = type(filelist);
+
+        if ('array' !== dataType) {
+
+        } else {
+
+            Vue.util.each(filelist, function (item, key) {
+
+                _mergeExceptUndefined(
+                    {url: '', success: Vue.util.NOOP}
+                    , item
+                );
+
+            });
+
+
+        }
 
     }
+
+    function _loadFile(url, success, error, props) {
+
+
+        var node = document.createElement('SCRIPT');
+        var header = document.head;
+
+        node.onload = function () {
+            success();
+            _clean(node);
+            node = null;
+        };
+
+        node.onerror = function () {
+            error(event);
+            _clean(node);
+            node = null;
+        }
+
+        props = extend(props, {
+            async: true,
+            type: 'text/javascript',
+            src: url
+        });
+
+        Vue.util.each(props, function (item, key) {
+            node[key] = item;
+        });
+
+        header.insertBefore(node, header.firstChild);
+
+        function _clean(node) {
+            node.onload = node.onerror = node.onreadystatechange = null;
+            for (var p in node) {
+                delete node[p];
+            }
+            header.removeChild(node);
+        }
+
+    }
+
 
     /**
      * Get data type
