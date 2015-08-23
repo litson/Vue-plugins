@@ -190,14 +190,6 @@
 
         var blankRE = /^\s*$/;
 
-        //Vue.util.each(Vue.ajaxSettings, function (item, key) {
-        //
-        //    if (options[key] === undefined) {
-        //        options[key] = item;
-        //    }
-        //
-        //});
-
         _mergeExceptUndefined(Vue.ajaxSettings, options);
 
         // 过滤掉hash
@@ -217,19 +209,13 @@
             Vue.util.log('暂不支持绕过缓存噢~');
         }
 
-
         // 不走 xhr + eval 的加载脚本方式，改为外联。保证没有跨域问题,而且性能上成
         if ('script' === dataType) {
-
-            Vue.util.log('暂不支持 type = "script" 奥~');
-
-            return null;
-
-            //return Vue.util.loadFile(options.url, function () {
-            //    _ajaxHelpers.success(null, null, options);
-            //}, function (event) {
-            //    _ajaxHelpers.error(event, 'error', null, options);
-            //});
+            return Vue.util.loadFile(options.url, function () {
+                _ajaxHelpers.success(null, null, options);
+            }, function (event) {
+                _ajaxHelpers.error(event, 'error', null, options);
+            });
         }
 
         // xhr 实例
@@ -238,7 +224,7 @@
         xhr['onreadystatechange'] = function () {
 
             if (xhr.readyState === 4) {
-                xhr['onreadystatechange'] = Vue.util.NOOP;
+                xhr['onreadystatechange'] = noop;
 
                 var result;
                 var error = false;
@@ -295,7 +281,6 @@
             options.success.call(context, data, 'success', xhr);
         }
     }
-
 
     function _mergeExceptUndefined(from, to) {
         Vue.util.each(from, function (item, key) {
@@ -384,6 +369,15 @@
     function noop() {
     }
 
+    var _loadFileDefaultSetting = {
+        url: '',
+        success: noop,
+        error: noop,
+        props: {}
+    };
+
+    var IS_CSS_RE = /\.css(?:\?|$)/i;
+
     /**
      *
      * 下载文件
@@ -430,24 +424,33 @@
 
         if ('array' !== dataType) {
 
-        } else {
-
-            Vue.util.each(filelist, function (item, key) {
-
-                _mergeExceptUndefined(
-                    {url: '', success: Vue.util.NOOP}
-                    , item
-                );
-
-            });
-
-
         }
+
+        Vue.util.each(filelist, function (item, key) {
+
+            _mergeExceptUndefined(
+                _loadFileDefaultSetting
+                , item
+            );
+
+            var temp = filelist[key];
+
+            _loadFile(temp.url, temp.success, temp.error, temp.props);
+
+        });
 
     }
 
+    /**
+     * TODO: CSS support.
+     *
+     * @param url
+     * @param success
+     * @param error
+     * @param props
+     * @private
+     */
     function _loadFile(url, success, error, props) {
-
 
         var node = document.createElement('SCRIPT');
         var header = document.head;
@@ -485,7 +488,6 @@
         }
 
     }
-
 
     /**
      * Get data type
@@ -527,23 +529,29 @@
         return (query === '') ? url : (url + '&' + query).replace(/[&?]{1,2}/, '?');
     }
 
+    // ==================== Bound to global Vue ==================== //
 
-    // ==================== Bind to global Vue ==================== //
+    function install(Vue) {
 
-    extend(Vue.util, {
+        extend(Vue.util, {
 
-        each: each,
-        param: param,
-        type: type,
-        NOOP: noop
+            each: each,
+            param: param,
+            type: type,
+            NOOP: noop
 
-    });
+        });
 
-    Vue.ajax = ajax;
-    Vue.get = ajaxGet;
-    Vue.post = ajaxPost;
+        Vue.ajax = ajax;
+        Vue.get = ajaxGet;
+        Vue.post = ajaxPost;
+        Vue.loadFile = loadFile;
 
-    // Vue.util.loadFile = loadFile;
+        console.log('[ Vuejs plugins installation success! ]');
+    }
+
+    // install it.
+    install(Vue);
 
 })(Vue);
 
