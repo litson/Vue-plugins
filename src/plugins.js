@@ -3,7 +3,7 @@
  * @fileoverview Vue plugins
  * @authors      litson.zhang@gmail.com
  * @date         2015.08.18
- * @version      1.0
+ * @version      1.0.2
  * @note
  */
 
@@ -211,7 +211,7 @@
 
         // 不走 xhr + eval 的加载脚本方式，改为外联。保证没有跨域问题,而且性能上成
         if ('script' === dataType) {
-            return Vue.util.loadFile(options.url, function () {
+            return Vue.loadFile(options.url, function () {
                 _ajaxHelpers.success(null, null, options);
             }, function (event) {
                 _ajaxHelpers.error(event, 'error', null, options);
@@ -290,6 +290,8 @@
             }
 
         });
+
+        return to;
     }
 
     /**
@@ -380,6 +382,81 @@
 
     /**
      *
+     *
+     *
+     * @param argsLength
+     * @param arguments
+     * @private
+     */
+    function _loadFileArgsParser(length, args) {
+
+        // 1. url success error props
+        // 2. url success error
+        // 3. url success props
+        // 4. url success
+        // 5. url props
+        // 6. url
+
+        var argsMapping = {
+            // url
+            1: function (args) {
+                return {
+                    url: args[0]
+                }
+            },
+
+            // url success || url props
+            2: function (args) {
+
+                var _type = type(args[1]);
+                var result = {
+                    url: args[0]
+                };
+
+                if ('function' === _type) {
+                    result.success = args[1];
+                } else {
+                    result.props = args[1];
+                }
+
+                return result;
+            },
+
+            // url success error || url success props
+            3: function (args) {
+
+                var _type = type(args[2]);
+                var result = {
+                    url: args[0],
+                    success: args[1]
+                };
+
+
+                if ('function' === _type) {
+                    result.error = args[2];
+                } else {
+                    result.props = args[2];
+                }
+
+                return result;
+            },
+
+            // url success error props
+            4: function (args) {
+                return {
+                    url: args[0],
+                    success: args[1],
+                    error: args[2],
+                    props: args[3]
+                }
+            }
+        }
+
+        return [argsMapping[length](args)];
+    }
+
+    /**
+     *
      * 下载文件
      *
      *
@@ -420,20 +497,16 @@
      */
     function loadFile(filelist) {
 
-        var dataType = type(filelist);
-
-        if ('array' !== dataType) {
-
+        if ('array' !== type(filelist)) {
+            filelist = _loadFileArgsParser(arguments.length, arguments);
         }
 
         Vue.util.each(filelist, function (item, key) {
 
-            _mergeExceptUndefined(
+            var temp = _mergeExceptUndefined(
                 _loadFileDefaultSetting
                 , item
             );
-
-            var temp = filelist[key];
 
             _loadFile(temp.url, temp.success, temp.error, temp.props);
 
@@ -452,8 +525,25 @@
      */
     function _loadFile(url, success, error, props) {
 
-        var node = document.createElement('SCRIPT');
+        var isCss = IS_CSS_RE.test(url);
+        var nodeName = 'SCRIPT';
+        var defaultProps = {
+            type: 'text/javascript',
+            async: true,
+            src: url
+        };
+
         var header = document.head;
+
+        if (isCss) {
+            nodeName = 'LINK';
+            defaultProps = {
+                rel: 'stylesheet',
+                href: url
+            }
+        }
+
+        var node = document.createElement(nodeName);
 
         node.onload = function () {
             success();
@@ -467,11 +557,7 @@
             node = null;
         }
 
-        props = extend(props, {
-            async: true,
-            type: 'text/javascript',
-            src: url
-        });
+        props = extend(props, defaultProps);
 
         Vue.util.each(props, function (item, key) {
             node[key] = item;
@@ -480,10 +566,17 @@
         header.insertBefore(node, header.firstChild);
 
         function _clean(node) {
-            node.onload = node.onerror = node.onreadystatechange = null;
+            node.onload = node.onerror = null;
+
+            // Css 文件在文档中被移除后，样式会更随丢失
+            if (isCss) {
+                return;
+            }
+
             for (var p in node) {
                 delete node[p];
             }
+
             header.removeChild(node);
         }
 

@@ -5,7 +5,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
     <title>Test Bed</title>
-    <link rel="stylesheet" href="//cdn.bootcss.com/bootstrap/3.3.5/css/bootstrap.css"/>
     <style>
         .wrapper {
             max-width: 960px;
@@ -35,22 +34,12 @@
 </div>
 
 <script src="//cdn.bootcss.com/vue/0.12.10/vue.js"></script>
-<script src="//cdn.bootcss.com/zepto/1.1.6/zepto.js"></script>
 <script src="dist/plugins.js"></script>
 <script>
 
-
     Vue.ready(function (Vue) {
-        console.log('Ready!', Vue);
-    });
 
-
-    // 0.12.* 以后的版本 无法输出Vue.util
-    // cdn.bootcss.com/vue/0.12.10/vue.js
-    // <script src="//cdn.bootcss.com/vue/0.11.10/vue.js"></ script>
-
-    !function (WIN, Vue) {
-
+        var WIN = window;
 
         // TODO: Vue.ajax + components.async @v 0.12.*
 
@@ -66,9 +55,6 @@
             // msg:1
         };
 
-        console.log(decodeURIComponent($.param(data)));
-        console.log(decodeURIComponent(Vue.util.param(data)));
-
         var url = 'http://localhost:63342/GITHUB/Vue-plugins/test-bed/test-datas.json';
 
         function __callBack(ajaxData) {
@@ -78,7 +64,6 @@
 
 
         Vue.get(url, data, __callBack);
-
 
         var vm = new Vue({
             el: '.wrapper',
@@ -98,6 +83,25 @@
 
         WIN.globalVM = vm;
 
+        // 直接load一个文件
+        Vue.loadFile('//cdn.bootcss.com/bootstrap/3.3.5/css/bootstrap.css',{id:'id'});
+        Vue.loadFile(
+                '//cdn.bootcss.com/zepto/1.1.6/zepto.js',
+                function () {
+                    console.log(decodeURIComponent($.param(data)));
+                    console.log(decodeURIComponent(Vue.util.param(data)));
+                }
+        );
+        // load 一组文件
+
+    });
+
+
+    // 0.12.* 以后的版本 无法输出Vue.util
+    // cdn.bootcss.com/vue/0.12.10/vue.js
+    // <script src="//cdn.bootcss.com/vue/0.11.10/vue.js"></ script>
+
+    !function (WIN, Vue) {
 
     }(window, Vue);
 
