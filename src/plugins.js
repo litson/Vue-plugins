@@ -3,7 +3,7 @@
  * @fileoverview Vue plugins
  * @authors      litson.zhang@gmail.com
  * @date         2015.08.18
- * @version      1.0.2
+ * @version      1.0.3
  * @note
  */
 
@@ -153,11 +153,13 @@
 
         data: '',
         dataType: 'json',
-        cache: false,
+        cache: true,
 
         async: true,
         username: null,
         password: null,
+        contentType: null,
+        xhrFields: null,
 
         context: null,
         timeout: 0,
@@ -187,6 +189,7 @@
         var hashIndex;
         var dataType;
         var xhr;
+        var abortTimer;
 
         var blankRE = /^\s*$/;
 
@@ -204,13 +207,14 @@
 
         dataType = options.dataType;
 
-        // TODO: Ajax.cache
-        if (options.cache) {
-            Vue.util.log('暂不支持绕过缓存噢~');
+        // ajax cache
+        if (!options.cache || 'script' === dataType) {
+            options.url = appendQuery(options.url, '_t=' + +new Date);
         }
 
         // 不走 xhr + eval 的加载脚本方式，改为外联。保证没有跨域问题,而且性能上成
         if ('script' === dataType) {
+            options.timeout && console.log('Sorry, dataType == script 暂不支持timeout');
             return Vue.loadFile(options.url, function () {
                 _ajaxHelpers.success(null, null, options);
             }, function (event) {
@@ -220,11 +224,20 @@
 
         // xhr 实例
         xhr = options.xhr();
+        var setHeader = xhr.setRequestHeader;
+
+        // 请求头设置
+        if (options.headers) {
+            Vue.util.each(options.headers, function (item, key) {
+                setHeader(key, item);
+            })
+        }
 
         xhr['onreadystatechange'] = function () {
 
             if (xhr.readyState === 4) {
                 xhr['onreadystatechange'] = noop;
+                clearTimeout(abortTimer);
 
                 var result;
                 var error = false;
@@ -233,14 +246,19 @@
 
                     result = xhr.responseText;
 
-                    if ('json' === dataType) {
+                    try {
 
-                        try {
-                            result = blankRE.test(result) ? null : JSON.parse(result + '');
-                        } catch (ex) {
-                            error = ex;
+                        if ('xml' === dataType) {
+                            result = xhr.responseXML;
                         }
 
+                        if ('json' === dataType) {
+                            result = blankRE.test(result) ? null : JSON.parse(result + '');
+                        }
+
+
+                    } catch (ex) {
+                        error = ex;
                     }
 
 
@@ -256,14 +274,26 @@
 
             }
 
+        };
+
+        // xhr 额外字段
+        if (options.xhrFields) {
+            Vue.util.each(options.xhrFields, function (item, key) {
+                xhr[key] = item;
+            });
         }
 
         // open
-        xhr.open(options.type, options.url, options.async, options.username, options.password);
+        xhr.open(options.type.toUpperCase(), options.url, options.async, options.username, options.password);
 
-        // TODO: Ajax.timeout
-        if (options.timeout) {
-            Vue.util.log('暂不支持超时噢~');
+        // ajax timeout
+        if (options.timeout > 0) {
+
+            abortTimer = setTimeout(function () {
+                xhr.onreadystatechange = noop;
+                xhr.abort();
+                _ajaxHelpers.error(null, 'timeout', xhr, options);
+            }, options.timeout);
         }
 
         xhr.send(options.data);
@@ -557,11 +587,10 @@
             node = null;
         }
 
-        props = extend(props, defaultProps);
-
-        Vue.util.each(props, function (item, key) {
-            node[key] = item;
-        });
+        extend(
+            node,
+            extend(props, defaultProps)
+        );
 
         header.insertBefore(node, header.firstChild);
 
