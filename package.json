@@ -1,6 +1,6 @@
 {
   "name": "Vue-plugins",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "main": "src/plugins.js",
   "devDependencies": {
     "gulp": "latest",

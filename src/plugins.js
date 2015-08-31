@@ -3,7 +3,7 @@
  * @fileoverview Vue plugins
  * @authors      litson.zhang@gmail.com
  * @date         2015.08.18
- * @version      1.0.3
+ * @version      1.0.4
  * @note
  */
 
@@ -190,6 +190,7 @@
         var dataType;
         var xhr;
         var abortTimer;
+        var hasPlaceholder;
 
         var blankRE = /^\s*$/;
 
@@ -207,19 +208,39 @@
 
         dataType = options.dataType;
 
+        // 双问号存在，说明为jsonp请求
+        hasPlaceholder = /\?.+=\?/.test(options.url);
+        if (hasPlaceholder) {
+            dataType = 'jsonp';
+        }
+
         // ajax cache
-        if (!options.cache || 'script' === dataType) {
+        if (
+            !options.cache
+            || 'script' === dataType
+            || 'jsonp' === dataType
+        ) {
             options.url = appendQuery(options.url, '_t=' + +new Date);
         }
 
         // 不走 xhr + eval 的加载脚本方式，改为外联。保证没有跨域问题,而且性能上成
         if ('script' === dataType) {
-            options.timeout && console.log('Sorry, dataType == script 暂不支持timeout');
-            return Vue.loadFile(options.url, function () {
-                _ajaxHelpers.success(null, null, options);
-            }, function (event) {
-                _ajaxHelpers.error(event, 'error', null, options);
+            // options.timeout && console.log('Sorry, dataType == script 暂不支持timeout');
+            return Vue.loadFile({
+                url: options.url,
+                success: function () {
+                    _ajaxHelpers.success(null, null, options);
+                },
+                error: function (event) {
+                    _ajaxHelpers.error(event, 'error', null, options);
+                },
+                props: {}
             });
+        }
+
+        // jsonp
+        if ('jsonp' === dataType) {
+            return jsonPadding(options);
         }
 
         // xhr 实例
@@ -329,7 +350,7 @@
      *
      * Ajax, method 'get'.
      *
-     * Vue.get( url [, data ] [, success(data, textStatus, jqXHR) ] [, dataType ] )
+     * Vue.get( url [, data ] [, success(data, textStatus, XHR) ] [, dataType ] )
      *
      * @param url
      * @param data
@@ -344,7 +365,7 @@
      *
      * Ajax, method 'post'.
      *
-     * Vue.post( url [, data ] [, success(data, textStatus, jqXHR) ] [, dataType ] )
+     * Vue.post( url [, data ] [, success(data, textStatus, XHR) ] [, dataType ] )
      *
      * @param url
      * @param data
@@ -355,6 +376,65 @@
         var options = _paramParser.apply(null, arguments);
         options.type = 'post';
         return Vue.ajax(options);
+    }
+
+    /**
+     *
+     * Ajax, method 'JSON'.
+     *
+     * Vue.getJSON( url [, data ] [, success(data, textStatus, XHR) ] [, dataType ] )
+     *
+     * @param url
+     * @param data
+     * @param success
+     * @param dataType
+     */
+    function ajaxGetJSON() {
+        var options = _paramParser.apply(null, arguments);
+        options.dataType = 'json';
+        return Vue.ajax(options);
+    }
+
+    /**
+     * jsonp函数
+     * @param options
+     * @returns {*}
+     */
+    function jsonPadding(options) {
+
+        // 黑魔法~
+        var callbackName = options.jsonpCallback || 'jsonp' + setTimeout('1');
+
+        var responseData;
+        var abortTimeout;
+
+        // 失败或成功后的回调
+        function callBack(event) {
+            clearTimeout(abortTimeout);
+
+            if (event.type === 'error' || !responseData) {
+                _ajaxHelpers.error(null, 'error', {abort: noop}, options);
+            } else {
+                _ajaxHelpers.success(responseData[0], {abort: noop}, options);
+            }
+        }
+
+        // 文件下载完成后，将返回值缓存起来
+        window[callbackName] = function () {
+            responseData = arguments;
+        }
+
+        if (options.timeout > 0) {
+            abortTimeout = setTimeout(function () {
+                _ajaxHelpers.error(null, 'timeout', {abort: noop}, options);
+            }, options.timeout);
+        }
+
+        return Vue.loadFile({
+            url: options.url.replace(/\?(.+)=\?/, '?$1=' + callbackName),
+            success: callBack,
+            error: callBack
+        });
     }
 
     /**
@@ -426,10 +506,31 @@
         // 4. url success
         // 5. url props
         // 6. url
+        // 7. { url, success, error, props }
 
         var argsMapping = {
-            // url
+            /**
+             *
+             * {
+             *      url,
+             *      success,
+             *      error,
+             *      props
+             * }
+             *
+             * or
+             *
+             * url
+             *
+             * @param args
+             * @returns {object}
+             */
             1: function (args) {
+
+                if ('object' === type(args[0])) {
+                    return args[0];
+                }
+
                 return {
                     url: args[0]
                 }
@@ -575,13 +676,13 @@
 
         var node = document.createElement(nodeName);
 
-        node.onload = function () {
-            success();
+        node.onload = function (event) {
+            success(event);
             _clean(node);
             node = null;
         };
 
-        node.onerror = function () {
+        node.onerror = function (event) {
             error(event);
             _clean(node);
             node = null;
@@ -668,6 +769,7 @@
         Vue.get = ajaxGet;
         Vue.post = ajaxPost;
         Vue.loadFile = loadFile;
+        Vue.getJSON = ajaxGetJSON;
 
         console.log('[ Vuejs plugins installation success! ]');
     }

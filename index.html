@@ -31,6 +31,17 @@
         </tr>
 
     </table>
+
+    <ul>
+        <li>
+            JSONP:{{jsonp}}
+        </li>
+        <li v-repeat="item : jsonp">
+            <strong>{{$key}}</strong> : {{item}}
+        </li>
+    </ul>
+
+
 </div>
 
 <script src="//cdn.bootcss.com/vue/0.12.10/vue.js"></script>
@@ -50,7 +61,8 @@
             items: {
                 testBbject: 1
             },
-            test2: [1, 3, 4]
+            test2: [1, 3, 4],
+            jsonp: {}
             //,
             // msg:1
         };
@@ -84,15 +96,28 @@
         WIN.globalVM = vm;
 
         // 直接load一个文件
-        Vue.loadFile('//cdn.bootcss.com/bootstrap/3.3.5/css/bootstrap.css',{id:'id'});
+        Vue.loadFile('//cdn.bootcss.com/bootstrap/3.3.5/css/bootstrap.css', {id: 'id'});
         Vue.loadFile(
                 '//cdn.bootcss.com/zepto/1.1.6/zepto.js',
                 function () {
                     console.log(decodeURIComponent($.param(data)));
                     console.log(decodeURIComponent(Vue.util.param(data)));
+//                    $.getJSON("https://www.baifubao.com/portrait/0/get_portrait/0?callback=?", function (data) {
+//                        $('#userAvatar').attr('src', data.head_url);
+//                    });
                 }
         );
         // load 一组文件
+
+
+        var jsonpUrl1 = 'http://qianbao.baidu.com/is/check_black_list?invite_code=test&http_referer=&call_back=?';
+        var jsonpUrl2 = 'https://www.baifubao.com/portrait/0/get_portrait/0?callback=?';
+
+        Vue.getJSON(jsonpUrl1, function (data) {
+
+            vm.$data.$add('jsonp', data);
+        });
+
 
     });
 
