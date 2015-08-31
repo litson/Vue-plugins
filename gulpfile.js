@@ -13,8 +13,16 @@ var uglify = require('gulp-uglify');
 
 // ==================== tasks ==================== //
 
-var filePath = 'src/*.js';
 var distPath = './dist/';
+
+var fileList = [
+    'plugins.js',
+    'ajax.js',
+    'domReady.js'
+].map(function (item) {
+        return 'src/' + item;
+    });
+
 
 gulp.task('op', function () {
     gulp.src(
@@ -39,7 +47,7 @@ gulp.task('op', function () {
 });
 
 gulp.task('combo', function () {
-    gulp.src(filePath).pipe(concat('plugins.js')).pipe(
+    gulp.src(fileList).pipe(concat('plugins.js')).pipe(
         gulp.dest(distPath)
     );
 });
@@ -53,10 +61,10 @@ gulp.task('release', function () {
 
 gulp.task('default', function () {
 
-    gulp.src(filePath)
+    gulp.src(fileList)
         .pipe(
-        watch(filePath, function () {
-        gulp.start('combo');
-    }));
+        watch(fileList, function () {
+            gulp.start('combo');
+        }));
 
 });

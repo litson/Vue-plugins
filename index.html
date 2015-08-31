@@ -34,7 +34,7 @@
 
     <ul>
         <li>
-            JSONP:{{jsonp}}
+            JSONP:{{jsonp.result_info}}
         </li>
         <li v-repeat="item : jsonp">
             <strong>{{$key}}</strong> : {{item}}
@@ -102,9 +102,6 @@
                 function () {
                     console.log(decodeURIComponent($.param(data)));
                     console.log(decodeURIComponent(Vue.util.param(data)));
-//                    $.getJSON("https://www.baifubao.com/portrait/0/get_portrait/0?callback=?", function (data) {
-//                        $('#userAvatar').attr('src', data.head_url);
-//                    });
                 }
         );
         // load 一组文件
@@ -114,22 +111,11 @@
         var jsonpUrl2 = 'https://www.baifubao.com/portrait/0/get_portrait/0?callback=?';
 
         Vue.getJSON(jsonpUrl1, function (data) {
-
-            vm.$data.$add('jsonp', data);
+            console.log(data);
         });
 
 
     });
-
-
-    // 0.12.* 以后的版本 无法输出Vue.util
-    // cdn.bootcss.com/vue/0.12.10/vue.js
-    // <script src="//cdn.bootcss.com/vue/0.11.10/vue.js"></ script>
-
-    !function (WIN, Vue) {
-
-    }(window, Vue);
-
 
 </script>
 </body>

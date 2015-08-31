@@ -53,6 +53,8 @@
 
     };
 
+    console.log('[ Vuejs < domReady module > installation success! ]');
+
 })(Vue, window.document);
 
 
