@@ -7,3 +7,7 @@
 - Vue.loadScript
 - Vue.util.param
 - Vue.util.each
+
+- Vue.getJSON
+
+ 
