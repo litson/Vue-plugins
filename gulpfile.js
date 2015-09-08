@@ -18,8 +18,8 @@ var distPath = './dist/';
 var fileList = [
     'plugins.js',
     'ajax.js',
-    'domReady.js',
-    'Vue-pipe.js'
+    'domReady.js' //,
+    // 'Vue-pipe.js'
 ].map(function (item) {
         return 'src/' + item;
     });
@@ -48,7 +48,7 @@ gulp.task('op', function () {
 });
 
 gulp.task('combo', function () {
-    gulp.src(fileList).pipe(concat('plugins.js')).pipe(
+    gulp.src(fileList).pipe(concat('vue-plugin.js')).pipe(
         gulp.dest(distPath)
     );
 });
