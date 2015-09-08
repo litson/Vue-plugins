@@ -8,7 +8,7 @@
     "gulp-concat-util": "latest",
     "gulp-sourcemaps": "latest",
     "gulp-jshint": "latest",
-    "gulp-uglify": "latest",
+    "gulp-uglifyjs": "latest",
     "gulp-size": "latest"
   }
 }

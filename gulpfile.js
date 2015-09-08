@@ -6,7 +6,7 @@ var size = require('gulp-size');
 var watch = require('gulp-watch');
 
 var concat = require('gulp-concat-util');
-var uglify = require('gulp-uglify');
+var uglify = require('gulp-uglifyjs');
 // var jshint = require('gulp-jshint');
 
 // var sourceMaps = require('gulp-sourcemaps');
@@ -30,7 +30,7 @@ gulp.task('op', function () {
         distPath + '*.js'
     )
         .pipe(
-        uglify()
+        uglify('vue-plugin.min.js')
     )
         .pipe(
         size(
@@ -57,7 +57,7 @@ gulp.task('release', function () {
     gulp.start('combo');
     setTimeout(function () {
         gulp.start('op');
-    }, 1000)
+    }, 1000);
 });
 
 gulp.task('default', function () {
