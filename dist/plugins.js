@@ -1,6 +1,6 @@
 /**
  * @file
- * @fileoverview Vue plugins
+ * @fileoverview each / type / noop
  * @authors      litson.zhang@gmail.com
  * @date         2015.08.18
  * @version      1.0.5
@@ -73,7 +73,7 @@
 
 /**
  * @file
- * @fileoverview Vue plugins
+ * @fileoverview Vue ajax
  * @authors      litson.zhang@gmail.com
  * @date         2015.08.18
  * @version      1.0.4
@@ -101,6 +101,7 @@
     var extend = Vue.util.extend;
     var noop = Vue.util.NOOP;
     var type = Vue.util.type;
+    var forEach = Vue.util.each;
 
     /**
      *
@@ -171,7 +172,7 @@
 
         var isPlainObject = 'object' === type(elements);
 
-        Vue.util.each(elements, function (item, key) {
+        forEach(elements, function (item, key) {
 
             var _type = type(item);
             var _isPlainObject = 'object' === _type;
@@ -311,7 +312,7 @@
 
         // 请求头设置
         if (options.headers) {
-            Vue.util.each(options.headers, function (item, key) {
+            forEach(options.headers, function (item, key) {
                 setHeader(key, item);
             })
         }
@@ -361,7 +362,7 @@
 
         // xhr 额外字段
         if (options.xhrFields) {
-            Vue.util.each(options.xhrFields, function (item, key) {
+            forEach(options.xhrFields, function (item, key) {
                 xhr[key] = item;
             });
         }
@@ -405,7 +406,7 @@
      * @private
      */
     function _mergeExceptUndefined(from, to) {
-        Vue.util.each(from, function (item, key) {
+        forEach(from, function (item, key) {
 
             if (to[key] === undefined) {
                 to[key] = item;
@@ -696,7 +697,7 @@
             filelist = _loadFileArgsParser(arguments.length, arguments);
         }
 
-        Vue.util.each(filelist, function (item, key) {
+        forEach(filelist, function (item, key) {
 
             var temp = _mergeExceptUndefined(
                 _loadFileDefaultSetting
@@ -873,3 +874,59 @@
 })(Vue, window.document);
 
 
+
+/**
+ * @file
+ * @fileoverview Vue plugins
+ * @authors      litson.zhang@gmail.com
+ * @date         2015.08.18
+ * @version      1.0
+ * @note
+ */
+/* global Vue */
+;
+(function (Vue) {
+
+    /**
+     *
+     *
+     *      // pagelet的name
+     *      name : ''
+     *
+     *      // 指定text/html的js作为模板，或 html片段（最终都会按照text/plain处理）
+     *      // 当该参数为 null 时，会取相关节点内的 innerHTML 做为模板
+     *      tpl : '/path/to/tpl/login.{js,tpl}' || null ;
+     *
+     *      // 内部维护一个资源列表？
+     *      // 依赖的样式文件
+     *      css : [ '/path/to/css/main.css', '/path/to/css/login.css' ] || null;
+     *
+     *
+     *      // 内部维护一个资源列表?
+     *      // 依赖的js文件
+     *      js  : [ '/path/to/js/util.js', '/path/to/js/login.js' ] || null;
+     *
+     *      // 数据地址
+     *      dataUrl: '';
+     *
+     *      // 生成 pagelet 之前对ajax data 做下处理，比如数据过滤等等.
+     *      // @return 处理后的数据。
+     *      beforeRender : function( ajaxData ) { return ajaxData; }
+     *
+     *
+     *
+     *
+     *
+     *
+     *
+     */
+
+    Vue.directive('pagelet', {
+        isLiteral: true,
+        bind: function () {
+            console.log(this);
+        }
+    });
+
+
+})(Vue);

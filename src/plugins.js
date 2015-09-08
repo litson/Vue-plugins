@@ -1,6 +1,6 @@
 /**
  * @file
- * @fileoverview Vue plugins
+ * @fileoverview each / type / noop
  * @authors      litson.zhang@gmail.com
  * @date         2015.08.18
  * @version      1.0.5

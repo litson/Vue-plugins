@@ -44,5 +44,12 @@
      *
      */
 
+    Vue.directive('pagelet', {
+        isLiteral: true,
+        bind: function () {
+            console.log(this);
+        }
+    });
+
 
 })(Vue);

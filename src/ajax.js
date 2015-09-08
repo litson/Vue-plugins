@@ -1,6 +1,6 @@
 /**
  * @file
- * @fileoverview Vue plugins
+ * @fileoverview Vue ajax
  * @authors      litson.zhang@gmail.com
  * @date         2015.08.18
  * @version      1.0.4
@@ -28,6 +28,7 @@
     var extend = Vue.util.extend;
     var noop = Vue.util.NOOP;
     var type = Vue.util.type;
+    var forEach = Vue.util.each;
 
     /**
      *
@@ -98,7 +99,7 @@
 
         var isPlainObject = 'object' === type(elements);
 
-        Vue.util.each(elements, function (item, key) {
+        forEach(elements, function (item, key) {
 
             var _type = type(item);
             var _isPlainObject = 'object' === _type;
@@ -238,7 +239,7 @@
 
         // 请求头设置
         if (options.headers) {
-            Vue.util.each(options.headers, function (item, key) {
+            forEach(options.headers, function (item, key) {
                 setHeader(key, item);
             })
         }
@@ -288,7 +289,7 @@
 
         // xhr 额外字段
         if (options.xhrFields) {
-            Vue.util.each(options.xhrFields, function (item, key) {
+            forEach(options.xhrFields, function (item, key) {
                 xhr[key] = item;
             });
         }
@@ -332,7 +333,7 @@
      * @private
      */
     function _mergeExceptUndefined(from, to) {
-        Vue.util.each(from, function (item, key) {
+        forEach(from, function (item, key) {
 
             if (to[key] === undefined) {
                 to[key] = item;
@@ -623,7 +624,7 @@
             filelist = _loadFileArgsParser(arguments.length, arguments);
         }
 
-        Vue.util.each(filelist, function (item, key) {
+        forEach(filelist, function (item, key) {
 
             var temp = _mergeExceptUndefined(
                 _loadFileDefaultSetting

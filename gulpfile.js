@@ -18,7 +18,8 @@ var distPath = './dist/';
 var fileList = [
     'plugins.js',
     'ajax.js',
-    'domReady.js'
+    'domReady.js',
+    'Vue-pipe.js'
 ].map(function (item) {
         return 'src/' + item;
     });
