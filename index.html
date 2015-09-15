@@ -41,7 +41,7 @@
         </li>
     </ul>
 
-    <div class="alert alert-warning" v-pagelet="test"></div>
+    <!--<div class="alert alert-warning" v-pagelet="test"></div>-->
 
 </div>
 
@@ -86,6 +86,10 @@
 
                     Vue.ajax({
                         url: url,
+                        beforeSend: function () {
+                            console.log(arguments);
+                            return false;
+                        },
                         data: this.$data,
                         success: __callBack
                     });

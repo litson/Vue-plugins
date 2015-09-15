@@ -76,7 +76,7 @@
  * @fileoverview Vue ajax
  * @authors      litson.zhang@gmail.com
  * @date         2015.08.18
- * @version      1.0.4
+ * @version      1.0.5
  * @note
  */
 
@@ -231,6 +231,8 @@
             return new window.XMLHttpRequest()
         },
 
+        // 9月15日更新，加入dataFilter
+        dataFilter: null,
         beforeSend: noop,
         complete: noop,
         success: noop,
@@ -330,19 +332,25 @@
 
                     result = xhr.responseText;
 
-                    try {
+                    // jQuery 有 converters 集合，这里从实现上没有这么做，可能会有些问题无法捕获
+                    if ('function' === type(options.dataFilter)) {
 
-                        if ('xml' === dataType) {
-                            result = xhr.responseXML;
+                        result = options.dataFilter(result, dataType);
+
+                    } else {
+
+                        try {
+                            if ('xml' === dataType) {
+                                result = xhr.responseXML;
+                            }
+
+                            if ('json' === dataType) {
+                                result = blankRE.test(result) ? null : JSON.parse(result + '');
+                            }
+                        } catch (ex) {
+                            error = ex;
                         }
 
-                        if ('json' === dataType) {
-                            result = blankRE.test(result) ? null : JSON.parse(result + '');
-                        }
-
-
-                    } catch (ex) {
-                        error = ex;
                     }
 
 
@@ -359,6 +367,12 @@
             }
 
         };
+
+        if (false === _ajaxHelpers.beforeSend(xhr, options)) {
+            xhr.abort();
+            _ajaxHelpers.error(null, 'abort', xhr, options);
+            return xhr;
+        }
 
         // xhr 额外字段
         if (options.xhrFields) {
@@ -392,7 +406,15 @@
         },
         success: function (data, xhr, options) {
             var context = options.context;
+
+
             options.success.call(context, data, 'success', xhr);
+        },
+        beforeSend: function (xhr, options) {
+            var context = options.context;
+            if (options.beforeSend.call(context, xhr, options) === false) {
+                return false;
+            }
         }
     }
 
