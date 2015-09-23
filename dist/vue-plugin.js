@@ -76,7 +76,7 @@
  * @fileoverview Vue ajax
  * @authors      litson.zhang@gmail.com
  * @date         2015.08.18
- * @version      1.0.5
+ * @version      1.0.6
  * @note
  */
 
@@ -764,17 +764,12 @@
 
         var node = document.createElement(nodeName);
 
-        node.onload = function (event) {
-            success(event);
+        // 合二为一
+        node.onload = node.onerror = function (event) {
+            (event.type === 'load') ? success(event) : error(event);
             _clean(node);
             node = null;
         };
-
-        node.onerror = function (event) {
-            error(event);
-            _clean(node);
-            node = null;
-        }
 
         extend(
             node,
