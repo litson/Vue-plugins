@@ -3,7 +3,7 @@
  * @fileoverview Vue ajax
  * @authors      litson.zhang@gmail.com
  * @date         2015.08.18
- * @version      1.0.7
+ * @version      1.0.7.1
  * @note
  */
 
@@ -188,7 +188,7 @@
         var abortTimer;
         var hasPlaceholder;
 
-        var protocol = /^([\w-]+:)\/\//.test(settings.url) ? RegExp.$1 : window.location.protocol;
+        var protocol = /^([\w-]+:)\/\//.test(options.url) ? RegExp.$1 : window.location.protocol;
 
         _mergeExceptUndefined(Vue.ajaxSettings, options);
 
