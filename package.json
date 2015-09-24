@@ -1,6 +1,6 @@
 {
   "name": "Vue-plugins",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "main": "dist/vue-plugin.js",
   "devDependencies": {
     "gulp": "latest",

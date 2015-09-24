@@ -76,7 +76,7 @@
  * @fileoverview Vue ajax
  * @authors      litson.zhang@gmail.com
  * @date         2015.08.18
- * @version      1.0.6
+ * @version      1.0.7
  * @note
  */
 
@@ -239,7 +239,11 @@
         error: noop
     };
 
+
+    var blankRE = /^\s*$/;
+
     /**
+     *
      *
      *
      *
@@ -257,9 +261,16 @@
         var abortTimer;
         var hasPlaceholder;
 
-        var blankRE = /^\s*$/;
+        var protocol = /^([\w-]+:)\/\//.test(settings.url) ? RegExp.$1 : window.location.protocol;
 
         _mergeExceptUndefined(Vue.ajaxSettings, options);
+
+        if (!options.crossDomain) {
+            options.crossDomain =
+                /^([\w-]+:)?\/\/([^\/]+)/.test(options.url)
+                && RegExp.$2 != window.location.host;
+        }
+
 
         // 过滤掉hash
         hashIndex = options.url.indexOf('#');
@@ -310,13 +321,19 @@
 
         // xhr 实例
         xhr = options.xhr();
-        var setHeader = xhr.setRequestHeader;
 
-        // 请求头设置
-        if (options.headers) {
-            forEach(options.headers, function (item, key) {
-                setHeader(key, item);
-            })
+        var headers = extend({}, options.headers || {});
+
+        if (!options.crossDomain) {
+            headers['X-Requested-With'] = 'XMLHttpRequest';
+        }
+
+        if (
+            options.contentType
+            ||
+            ( options.data && options.type.toUpperCase() != 'GET' )
+        ) {
+            headers['Content-Type'] = options.contentType || 'application/x-www-form-urlencoded';
         }
 
         xhr['onreadystatechange'] = function () {
@@ -328,7 +345,7 @@
                 var result;
                 var error = false;
 
-                if ((xhr.status >= 200 && xhr.status < 300) || xhr.status == 304) {
+                if ((xhr.status >= 200 && xhr.status < 300) || xhr.status == 304 || (xhr.status == 0 && protocol == 'file:')) {
 
                     result = xhr.responseText;
 
@@ -383,6 +400,11 @@
 
         // open
         xhr.open(options.type.toUpperCase(), options.url, options.async, options.username, options.password);
+
+        // 请求头设置，一次性push
+        forEach(headers, function (item, key) {
+            xhr.setRequestHeader(key, item);
+        });
 
         // ajax timeout
         if (options.timeout > 0) {
