@@ -1055,12 +1055,24 @@
 	    constructor: vQuery,
 	    init: function (selecter) {
 	        var self = this;
+	        var dom = [];
 
 	        if (!selecter) {
-	            return self;
+	            return dom;
 	        }
 
-	        var dom = makeArray(doc.querySelectorAll(selecter), 0);
+	        // element || window
+	        if (
+	            selecter.nodeType
+	            || (typeof selecter === 'object' && 'setInterval' in selecter)
+	        ) {
+	            dom = [selecter];
+	        }
+
+	        // selector
+	        if (typeof selecter === 'string') {
+	            dom = makeArray(doc.querySelectorAll(selecter), 0);
+	        }
 
 	        Vue.util.each(
 	            dom,
