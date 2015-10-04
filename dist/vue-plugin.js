@@ -61,7 +61,8 @@
 	__webpack_require__(3);
 	__webpack_require__(4);
 
-
+	// �ֶ�����
+	Vue.vueExpose = Vue.vueExpose.sort();
 
 /***/ },
 /* 1 */
@@ -85,6 +86,14 @@
 	    Vue.util.each = each;
 	    Vue.util.type = type;
 	    Vue.util.NOOP = noop;
+
+	    // 将Vue-plugin的API签名打包到vueExpose中，方便作者查看
+	    Vue.vueExpose = Vue.vueExpose || [];
+	    Vue.vueExpose.push.apply(Vue.vueExpose, [
+	        'util.noop',
+	        'util.each',
+	        'util.type'
+	    ]);
 
 	    console.log('[ Vuejs < plugins module > installation success! ]');
 	}
@@ -160,6 +169,18 @@
 	    Vue.post = ajaxPost;
 	    Vue.loadFile = loadFile;
 	    Vue.getJSON = ajaxGetJSON;
+
+	    // 将Vue-plugin的API签名打包到vueExpose中，方便作者查看
+	    Vue.vueExpose = Vue.vueExpose || [];
+	    Vue.vueExpose.push.apply(Vue.vueExpose, [
+	        'ajaxSetting',
+	        'util.param',
+	        'ajax',
+	        'post',
+	        'get',
+	        'loadFile',
+	        'getJSON'
+	    ]);
 
 	    console.log('[ Vuejs < ajax module > installation success! ]');
 	}
@@ -972,6 +993,10 @@
 
 	};
 
+	// 将Vue-plugin的API签名打包到vueExpose中，方便作者查看
+	Vue.vueExpose = Vue.vueExpose || [];
+	Vue.vueExpose.push('ready');
+
 	console.log('[ Vuejs < domReady module > installation success! ]');
 
 /***/ },
@@ -1001,6 +1026,10 @@
 
 	function install(Vue) {
 	    Vue.$ = vQuery;
+	    // 将Vue-plugin的API签名打包到vueExpose中，方便作者查看
+	    Vue.vueExpose = Vue.vueExpose || [];
+	    Vue.vueExpose.push('$');
+
 	    console.log('[ Vuejs < Vue $ module > installation success! ]');
 	}
 	// ==================== vQuery ==================== //
@@ -1076,6 +1105,8 @@
 	        return this;
 	    },
 
+	    // Vue不同版本处理不一样，早些版本是attr自动加Vue.config中的前缀，
+	    // 1.0版本后才去掉了前缀，所以干脆这里重新实现了。
 	    attr: function (name, value) {
 	        if (value == undefined) {
 	            return this[0].getAttribute(name);

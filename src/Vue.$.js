@@ -21,6 +21,10 @@
 
 function install(Vue) {
     Vue.$ = vQuery;
+    // 将Vue-plugin的API签名打包到vueExpose中，方便作者查看
+    Vue.vueExpose = Vue.vueExpose || [];
+    Vue.vueExpose.push('$');
+
     console.log('[ Vuejs < Vue $ module > installation success! ]');
 }
 // ==================== vQuery ==================== //
@@ -96,6 +100,8 @@ Vue.util.extend(proto, {
         return this;
     },
 
+    // Vue不同版本处理不一样，早些版本是attr自动加Vue.config中的前缀，
+    // 1.0版本后才去掉了前缀，所以干脆这里重新实现了。
     attr: function (name, value) {
         if (value == undefined) {
             return this[0].getAttribute(name);

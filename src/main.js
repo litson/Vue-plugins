@@ -15,3 +15,5 @@ require('./ajax.js');
 require('./domReady.js');
 require('./Vue.$.js');
 
+//  ÷∂Ø≈≈–Ú
+Vue.vueExpose = Vue.vueExpose.sort();

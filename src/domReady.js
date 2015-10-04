@@ -52,4 +52,8 @@ Vue.ready = function (fn) {
 
 };
 
+// 将Vue-plugin的API签名打包到vueExpose中，方便作者查看
+Vue.vueExpose = Vue.vueExpose || [];
+Vue.vueExpose.push('ready');
+
 console.log('[ Vuejs < domReady module > installation success! ]');

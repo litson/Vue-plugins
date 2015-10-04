@@ -21,6 +21,18 @@ function install(Vue) {
     Vue.loadFile = loadFile;
     Vue.getJSON = ajaxGetJSON;
 
+    // 将Vue-plugin的API签名打包到vueExpose中，方便作者查看
+    Vue.vueExpose = Vue.vueExpose || [];
+    Vue.vueExpose.push.apply(Vue.vueExpose, [
+        'ajaxSetting',
+        'util.param',
+        'ajax',
+        'post',
+        'get',
+        'loadFile',
+        'getJSON'
+    ]);
+
     console.log('[ Vuejs < ajax module > installation success! ]');
 }
 

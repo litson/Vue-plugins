@@ -17,6 +17,14 @@ function install(Vue) {
     Vue.util.type = type;
     Vue.util.NOOP = noop;
 
+    // 将Vue-plugin的API签名打包到vueExpose中，方便作者查看
+    Vue.vueExpose = Vue.vueExpose || [];
+    Vue.vueExpose.push.apply(Vue.vueExpose, [
+        'util.noop',
+        'util.each',
+        'util.type'
+    ]);
+
     console.log('[ Vuejs < plugins module > installation success! ]');
 }
 
