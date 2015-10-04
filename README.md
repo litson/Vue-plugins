@@ -34,6 +34,7 @@ Vue.js的插件系统，目的在于弃用jQuery 或 Zepto，有一定的落地�
  
  $test.removeClass('test-item');
  
+ // show / hide / width / height / css
  // etc.
 
 ```
