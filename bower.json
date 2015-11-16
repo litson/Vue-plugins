@@ -1,0 +1,27 @@
+{
+  "name": "vuep",
+  "version": "1.0.6.0",
+  "homepage": "https://github.com/litson/Vue-plugins",
+  "authors": [
+    "litson.zhang@gmail.com"
+  ],
+  "description": "Plugins for Vuejs",
+  "main": "./src/main.js",
+  "moduleType": [
+    "globals"
+  ],
+  "keywords": [
+    "vue",
+    "ajax",
+    "jquery",
+    "zepto"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
