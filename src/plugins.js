@@ -11,7 +11,7 @@
 
 // ==================== Bound to global Vue ==================== //
 
-function install(Vue) {
+function install( Vue ) {
 
     Vue.util.each = each;
     Vue.util.type = type;
@@ -19,13 +19,13 @@ function install(Vue) {
 
     // 将Vue-plugin的API签名打包到vueExpose中，方便作者查看
     Vue.vueExpose = Vue.vueExpose || [];
-    Vue.vueExpose.push.apply(Vue.vueExpose, [
+    Vue.vueExpose.push.apply( Vue.vueExpose, [
         'util.noop',
         'util.each',
         'util.type'
-    ]);
+    ] );
 
-    console.log('[ Vuejs < plugins module > installation success! ]');
+    console.log( '[ Vuejs < plugins module > installation success! ]' );
 }
 
 /**
@@ -38,17 +38,17 @@ function install(Vue) {
  * @param elements
  * @param callBack
  */
-function each(elements, callBack) {
-    if (!elements) {
+function each( elements, callBack ) {
+    if ( !elements ) {
         return;
     }
 
-    if (elements.forEach) {
-        return elements.forEach(callBack);
+    if ( elements.forEach ) {
+        return elements.forEach( callBack );
     }
 
-    for (var key in elements) {
-        if (elements.hasOwnProperty(key) && callBack(elements[key], key, elements) === false) {
+    for ( var key in elements ) {
+        if ( elements.hasOwnProperty( key ) && callBack( elements[ key ], key, elements ) === false ) {
             break;
         }
     }
@@ -66,9 +66,9 @@ function noop() {
  * @param object
  * @returns {string}
  */
-function type(object) {
-    return Object.prototype.toString.call(object).replace(/\[\object|\]|\s/gi, '').toLowerCase();
+function type( object ) {
+    return Object.prototype.toString.call( object ).replace( /\[\object|\]|\s/gi, '' ).toLowerCase();
 }
 
 // install it.
-install(Vue);
+install( Vue );

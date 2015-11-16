@@ -10,10 +10,10 @@
 /* global module */
 
 'use strict';
-require('./plugins.js');
-require('./ajax.js');
-require('./domReady.js');
-require('./Vue.$.js');
+require( './plugins.js' );
+require( './ajax.js' );
+require( './domReady.js' );
+require( './Vue.$.js' );
 
 //  ÷∂Ø≈≈–Ú
 Vue.vueExpose = Vue.vueExpose.sort();

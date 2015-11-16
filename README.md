@@ -45,3 +45,7 @@ Vue.js的插件系统，目的在于弃用jQuery 或 Zepto，有一定的落地�
 - Vue.util.NOOP
 - Vue.util.param
 - Vue.util.type
+
+
+### bower
+`bower install vuep`
