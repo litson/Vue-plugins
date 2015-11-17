@@ -5,7 +5,7 @@
   "authors": [
     "[ Toby Zhang ] <litson.zhang@gmail.com>"
   ],
-  "description": "Plugins for Vuejs",
+  "description": "Plugins for Vuejs. Vue.ajax, Vue.getJSON & Vue.ready (Fire on DOMContentLoaded)...etc.",
   "main": "./dist/vue-plugin.js",
   "moduleType": [
     "globals"
