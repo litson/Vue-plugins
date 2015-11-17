@@ -19,11 +19,14 @@
   "license": "MIT",
   "ignore": [
     "**/.*",
+    "*.html",
+    "webpack.config.js",
     "node_modules",
     "bower_components",
     "test",
     "src",
     "tests",
+    "*.json",
     "*.md"
   ]
 }
