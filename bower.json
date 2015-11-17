@@ -6,7 +6,7 @@
     "[ Toby Zhang ] <litson.zhang@gmail.com>"
   ],
   "description": "Plugins for Vuejs",
-  "main": "dist/vue-plugin.js",
+  "main": "./dist/vue-plugin.js",
   "moduleType": [
     "globals"
   ],
