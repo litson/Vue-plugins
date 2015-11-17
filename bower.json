@@ -3,15 +3,15 @@
   "version": "1.0.6.0",
   "homepage": "https://github.com/litson/Vue-plugins",
   "authors": [
-    "litson.zhang@gmail.com"
+    "[ Toby Zhang ] <litson.zhang@gmail.com>"
   ],
   "description": "Plugins for Vuejs",
-  "main": "./src/main.js",
+  "main": "dist/vue-plugin.js",
   "moduleType": [
     "globals"
   ],
   "keywords": [
-    "vue",
+    "vuejs",
     "ajax",
     "jquery",
     "zepto"
@@ -22,6 +22,8 @@
     "node_modules",
     "bower_components",
     "test",
-    "tests"
+    "src",
+    "tests",
+    "*.md"
   ]
 }

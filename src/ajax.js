@@ -13,13 +13,13 @@
 // ==================== Bound to global Vue ==================== //
 
 function install( Vue ) {
-    Vue.util.param = param;
 
-    Vue.ajax     = ajax;
-    Vue.get      = ajaxGet;
-    Vue.post     = ajaxPost;
-    Vue.loadFile = loadFile;
-    Vue.getJSON  = ajaxGetJSON;
+    Vue.util.param = param;
+    Vue.ajax       = ajax;
+    Vue.get        = ajaxGet;
+    Vue.post       = ajaxPost;
+    Vue.loadFile   = loadFile;
+    Vue.getJSON    = ajaxGetJSON;
 
     // 将Vue-plugin的API签名打包到vueExpose中，方便作者查看
     Vue.vueExpose = Vue.vueExpose || [];
@@ -52,7 +52,6 @@ var forEach = Vue.util.each;
 function param( elements, traditional ) {
 
     var result = [];
-
     result.add = function ( item, key ) {
 
         // If value is a function, invoke it and return its value
@@ -64,7 +63,7 @@ function param( elements, traditional ) {
             item = '';
         }
 
-        result[ result.length ] = encodeURIComponent( key ) + '=' + encodeURIComponent( item );
+        result[result.length] = encodeURIComponent( key ) + '=' + encodeURIComponent( item );
 
     };
 
@@ -72,7 +71,6 @@ function param( elements, traditional ) {
     _buildParam( result, elements, traditional );
 
     return result.join( '&' ).replace( /%20/g, '+' );
-
 }
 
 /**
@@ -121,15 +119,13 @@ function _buildParam( params, elements, traditional, prefix ) {
             if ( traditional ) {
                 key = prefix;
             } else {
-                key = [
-
-                    prefix
-                    , '['
-                    , (isPlainObject || _isPlainObject || _isArray) ? key : ''
-                    , ']'
-
-
-                ].join( '' );
+                key =
+                    [
+                        prefix
+                        , '['
+                        , (isPlainObject || _isPlainObject || _isArray) ? key : ''
+                        , ']'
+                    ].join( '' );
             }
         }
 
@@ -149,32 +145,27 @@ function _buildParam( params, elements, traditional, prefix ) {
 
 // Vue Ajax Default Options.
 Vue.ajaxSettings = {
-    type: 'GET',
-    url : location.href,
-
-    data    : '',
-    dataType: 'json',
-    cache   : true,
-
+    type       : 'GET',
+    url        : location.href,
+    data       : '',
+    dataType   : 'json',
+    cache      : true,
     async      : true,
     username   : null,
     password   : null,
     contentType: null,
     xhrFields  : null,
-
-    context: null,
-    timeout: 0,
-
-    xhr: function () {
+    context    : null,
+    timeout    : 0,
+    xhr        : function () {
         return new window.XMLHttpRequest()
     },
-
     // 9月15日更新，加入dataFilter
-    dataFilter: null,
-    beforeSend: noop,
-    complete  : noop,
-    success   : noop,
-    error     : noop
+    dataFilter : null,
+    beforeSend : noop,
+    complete   : noop,
+    success    : noop,
+    error      : noop
 };
 
 var blankRE = /^\s*$/;
@@ -197,7 +188,6 @@ function ajax( options ) {
     var xhr;
     var abortTimer;
     var hasPlaceholder;
-
     var protocol = /^([\w-]+:)\/\//.test( options.url ) ? RegExp.$1 : window.location.protocol;
 
     _mergeExceptUndefined( Vue.ajaxSettings, options );
@@ -262,7 +252,7 @@ function ajax( options ) {
     var headers = extend( {}, options.headers || {} );
 
     if ( !options.crossDomain ) {
-        headers[ 'X-Requested-With' ] = 'XMLHttpRequest';
+        headers['X-Requested-With'] = 'XMLHttpRequest';
     }
 
     if (
@@ -270,13 +260,13 @@ function ajax( options ) {
         ||
         ( options.data && options.type.toUpperCase() != 'GET' )
     ) {
-        headers[ 'Content-Type' ] = options.contentType || 'application/x-www-form-urlencoded';
+        headers['Content-Type'] = options.contentType || 'application/x-www-form-urlencoded';
     }
 
-    xhr[ 'onreadystatechange' ] = function () {
+    xhr['onreadystatechange'] = function () {
 
         if ( xhr.readyState === 4 ) {
-            xhr[ 'onreadystatechange' ] = noop;
+            xhr['onreadystatechange'] = noop;
             clearTimeout( abortTimer );
 
             var result;
@@ -304,9 +294,7 @@ function ajax( options ) {
                     } catch ( ex ) {
                         error = ex;
                     }
-
                 }
-
 
                 if ( error ) {
                     _ajaxHelpers.error( error, 'parsererror', xhr, options );
@@ -317,9 +305,7 @@ function ajax( options ) {
             } else {
                 _ajaxHelpers.error( xhr.statusText || null, xhr.status ? 'error' : 'abort', xhr, options );
             }
-
         }
-
     };
 
     if ( false === _ajaxHelpers.beforeSend( xhr, options ) ) {
@@ -331,7 +317,7 @@ function ajax( options ) {
     // xhr 额外字段
     if ( options.xhrFields ) {
         forEach( options.xhrFields, function ( item, key ) {
-            xhr[ key ] = item;
+            xhr[key] = item;
         } );
     }
 
@@ -375,7 +361,7 @@ var _ajaxHelpers = {
             return false;
         }
     }
-}
+};
 
 /**
  * 去掉undefined的属性
@@ -388,11 +374,9 @@ var _ajaxHelpers = {
  */
 function _mergeExceptUndefined( from, to ) {
     forEach( from, function ( item, key ) {
-
-        if ( to[ key ] === undefined ) {
-            to[ key ] = item;
+        if ( to[key] === undefined ) {
+            to[key] = item;
         }
-
     } );
 
     return to;
@@ -457,7 +441,6 @@ function jsonPadding( options ) {
 
     // 黑魔法~
     var callbackName = options.jsonpCallback || 'jsonp' + setTimeout( '1' );
-
     var responseData;
     var abortTimeout;
 
@@ -466,20 +449,20 @@ function jsonPadding( options ) {
         clearTimeout( abortTimeout );
 
         if ( event.type === 'error' || !responseData ) {
-            _ajaxHelpers.error( null, 'error', { abort: noop }, options );
+            _ajaxHelpers.error( null, 'error', {abort: noop}, options );
         } else {
-            _ajaxHelpers.success( responseData[ 0 ], { abort: noop }, options );
+            _ajaxHelpers.success( responseData[0], {abort: noop}, options );
         }
     }
 
     // 文件下载完成后，将返回值缓存起来
-    window[ callbackName ] = function () {
+    window[callbackName] = function () {
         responseData = arguments;
-    }
+    };
 
     if ( options.timeout > 0 ) {
         abortTimeout = setTimeout( function () {
-            _ajaxHelpers.error( null, 'timeout', { abort: noop }, options );
+            _ajaxHelpers.error( null, 'timeout', {abort: noop}, options );
         }, options.timeout );
     }
 
@@ -504,20 +487,15 @@ function jsonPadding( options ) {
 function _paramParser( url, data, success, dataType ) {
 
     if ( 'function' === type( data ) ) {
-
         dataType = success;
         success  = data;
         data     = undefined;
-
     }
 
     if ( 'function' !== type( success ) ) {
-
         dataType = success;
         success  = undefined;
-
     }
-
 
     return {
         url     : url,
@@ -525,7 +503,6 @@ function _paramParser( url, data, success, dataType ) {
         success : success,
         dataType: dataType
     }
-
 }
 
 var _loadFileDefaultSetting = {
@@ -534,7 +511,8 @@ var _loadFileDefaultSetting = {
     error  : noop,
     props  : {}
 };
-var IS_CSS_RE               = /\.css(?:\?|$)/i;
+
+var IS_CSS_RE = /\.css(?:\?|$)/i;
 
 /**
  *
@@ -573,27 +551,27 @@ function _loadFileArgsParser( length, args ) {
          */
         1: function ( args ) {
 
-            if ( 'object' === type( args[ 0 ] ) ) {
-                return args[ 0 ];
+            if ( 'object' === type( args[0] ) ) {
+                return args[0];
             }
 
             return {
-                url: args[ 0 ]
+                url: args[0]
             }
         },
 
         // url success || url props
         2: function ( args ) {
 
-            var _type  = type( args[ 1 ] );
+            var _type  = type( args[1] );
             var result = {
-                url: args[ 0 ]
+                url: args[0]
             };
 
             if ( 'function' === _type ) {
-                result.success = args[ 1 ];
+                result.success = args[1];
             } else {
-                result.props = args[ 1 ];
+                result.props = args[1];
             }
 
             return result;
@@ -602,17 +580,17 @@ function _loadFileArgsParser( length, args ) {
         // url success error || url success props
         3: function ( args ) {
 
-            var _type  = type( args[ 2 ] );
+            var _type  = type( args[2] );
             var result = {
-                url    : args[ 0 ],
-                success: args[ 1 ]
+                url    : args[0],
+                success: args[1]
             };
 
 
             if ( 'function' === _type ) {
-                result.error = args[ 2 ];
+                result.error = args[2];
             } else {
-                result.props = args[ 2 ];
+                result.props = args[2];
             }
 
             return result;
@@ -621,15 +599,15 @@ function _loadFileArgsParser( length, args ) {
         // url success error props
         4: function ( args ) {
             return {
-                url    : args[ 0 ],
-                success: args[ 1 ],
-                error  : args[ 2 ],
-                props  : args[ 3 ]
+                url    : args[0],
+                success: args[1],
+                error  : args[2],
+                props  : args[3]
             }
         }
-    }
+    };
 
-    return [ argsMapping[ length ]( args ) ];
+    return [argsMapping[length]( args )];
 }
 
 /**
@@ -688,7 +666,6 @@ function loadFile( filelist ) {
         _loadFile( temp.url, temp.success, temp.error, temp.props );
 
     } );
-
 }
 
 /**
@@ -746,12 +723,11 @@ function _loadFile( url, success, error, props ) {
         }
 
         for ( var p in node ) {
-            delete node[ p ];
+            delete node[p];
         }
 
         header.removeChild( node );
     }
-
 }
 
 /**
@@ -760,7 +736,6 @@ function _loadFile( url, success, error, props ) {
  * @param options
  */
 function serializeData( options ) {
-
     if ( options.data && type( options.data ) !== 'string' ) {
         options.data = Vue.util.param( options.data );
     }
@@ -769,7 +744,6 @@ function serializeData( options ) {
         options.url  = appendQuery( options.url, options.data );
         options.data = undefined;
     }
-
 }
 
 /**
