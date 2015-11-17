@@ -1,1 +1,1220 @@
-!function(e){function t(r){if(n[r])return n[r].exports;var o=n[r]={exports:{},id:r,loaded:!1};return e[r].call(o.exports,o,o.exports,t),o.loaded=!0,o.exports}var n={};return t.m=e,t.c=n,t.p="",t(0)}([function(e,t,n){"use strict";n(4),n(2),n(3),n(1),Vue.vueExpose=Vue.vueExpose.sort()},function(e,t){"use strict";function n(e){e.$=u,e.vueExpose=e.vueExpose||[],e.vueExpose.push("$"),console.log("[ Vuejs < Vue $ module > installation success! ]")}var r=document,o=function(e){return Array.prototype.slice.call(e,0)},u=function(e){return new u.fn.init(e)},s={constructor:u,init:function(e){var t=this,n=[];return e?((e.nodeType||"object"==typeof e&&"setInterval"in e)&&(n=[e]),"string"==typeof e&&(n=o(r.querySelectorAll(e),0)),Vue.util.each(n,function(e,n){t[n]=e}),t.length=n.length,n.__proto__=u.fn,n):n},length:0};Vue.util.extend(s,{size:function(){return this.length},addClass:function(e){for(var t=this.length;t--;)Vue.util.addClass(this[t],e);return this},removeClass:function(e){for(var t=this.length;t--;)Vue.util.removeClass(this[t],e);return this},remove:function(){for(var e=this.length;e--;)Vue.util.remove(this[e]);return this},attr:function(e,t){if(void 0==t)return this[0].getAttribute(e);for(var n=this.length;n--;)this[n].setAttribute(e,t);return this},removeAttr:function(e){for(var t=this.length;t--;)this[t].removeAttribute(e);return this},html:function(e){if(void 0==e)return this[0].innerHTML;for(var t=this.length;t--;)this[t].innerHTML=e;return this},show:function(){return this.css("display","")},hide:function(){return this.css("display","none")},css:function(e,t){function n(e){return"number"==typeof e?e+"px":e}var r=this.length;if(Vue.util.isPlainObject(e)){var o=[""];for(Vue.util.each(e,function(e,t){o.push(t+":"+n(e))}),o.push(""),o=o.join(";");r--;)this[r].style.cssText+=o}else{if(e=Vue.util.camelize(e),void 0==t)return window.getComputedStyle(this[0],null)[e];for(;r--;)this[r].style[e]=n(t)}return this},on:function(e,t){for(var n=this.length;n--;)Vue.util.on(this[n],e,t);return this},off:function(e,t){for(var n=this.length;n--;)Vue.util.off(this[n],e,t);return this}}),Vue.util.each(["width","height"],function(e){s[e]=function(t){return t?this.css(e,"string"==typeof t?t:t+"px"):this[0].getBoundingClientRect()[e]}}),u.fn=u.prototype=s,u.fn.init.prototype=u.fn,n(Vue)},function(e,t){function n(e){e.util.param=r,e.ajax=u,e.get=i,e.post=a,e.loadFile=d,e.getJSON=l,e.vueExpose=e.vueExpose||[],e.vueExpose.push.apply(e.vueExpose,["ajaxSetting","util.param","ajax","post","get","loadFile","getJSON"]),console.log("[ Vuejs < ajax module > installation success! ]")}function r(e,t){var n=[];return n.add=function(e,t){"function"===g(e)&&(e=e()),null==e&&(e=""),n[n.length]=encodeURIComponent(t)+"="+encodeURIComponent(e)},o(n,e,t),n.join("&").replace(/%20/g,"+")}function o(e,t,n,r){var u="object"===g(t);V(t,function(t,s){var i=g(t),a="object"===i,l="array"===i;r&&(s=n?r:[r,"[",u||a||l?s:"","]"].join("")),l||!n&&a?o(e,t,n,s):e.add(t,s)})}function u(e){var t,n,r,o,u,i=/^([\w-]+:)\/\//.test(e.url)?RegExp.$1:window.location.protocol;if(s(Vue.ajaxSettings,e),e.crossDomain||(e.crossDomain=/^([\w-]+:)?\/\/([^\/]+)/.test(e.url)&&RegExp.$2!=window.location.host),t=e.url.indexOf("#"),t>-1&&(e.url=e.url.slice(0,t)),v(e),n=e.dataType,u=/\?.+=\?/.test(e.url),u&&(n="jsonp"),e.cache&&"script"!==n&&"jsonp"!==n||(e.url=m(e.url,"_t="+ +new Date)),"script"===n)return Vue.loadFile({url:e.url,success:function(){w.success(null,null,e)},error:function(t){w.error(t,"error",null,e)},props:{}});if("jsonp"===n)return c(e);r=e.xhr();var a=y({},e.headers||{});return e.crossDomain||(a["X-Requested-With"]="XMLHttpRequest"),(e.contentType||e.data&&"GET"!=e.type.toUpperCase())&&(a["Content-Type"]=e.contentType||"application/x-www-form-urlencoded"),r.onreadystatechange=function(){if(4===r.readyState){r.onreadystatechange=x,clearTimeout(o);var t,u=!1;if(r.status>=200&&r.status<300||304==r.status||0==r.status&&"file:"==i){if(t=r.responseText,"function"===g(e.dataFilter))t=e.dataFilter(t,n);else try{"xml"===n&&(t=r.responseXML),"json"===n&&(t=j.test(t)?null:JSON.parse(t+""))}catch(s){u=s}u?w.error(u,"parsererror",r,e):w.success(t,r,e)}else w.error(r.statusText||null,r.status?"error":"abort",r,e)}},!1===w.beforeSend(r,e)?(r.abort(),w.error(null,"abort",r,e),r):(e.xhrFields&&V(e.xhrFields,function(e,t){r[t]=e}),r.open(e.type.toUpperCase(),e.url,e.async,e.username,e.password),V(a,function(e,t){r.setRequestHeader(t,e)}),e.timeout>0&&(o=setTimeout(function(){r.onreadystatechange=x,r.abort(),w.error(null,"timeout",r,e)},e.timeout)),r.send(e.data),r)}function s(e,t){return V(e,function(e,n){void 0===t[n]&&(t[n]=e)}),t}function i(){return Vue.ajax(f.apply(null,arguments))}function a(){var e=f.apply(null,arguments);return e.type="post",Vue.ajax(e)}function l(){var e=f.apply(null,arguments);return e.dataType="json",Vue.ajax(e)}function c(e){function t(t){clearTimeout(r),"error"!==t.type&&n?w.success(n[0],{abort:x},e):w.error(null,"error",{abort:x},e)}var n,r,o=e.jsonpCallback||"jsonp"+setTimeout("1");return window[o]=function(){n=arguments},e.timeout>0&&(r=setTimeout(function(){w.error(null,"timeout",{abort:x},e)},e.timeout)),Vue.loadFile({url:e.url.replace(/\?(.+)=\?/,"?$1="+o),success:t,error:t})}function f(e,t,n,r){return"function"===g(t)&&(r=n,n=t,t=void 0),"function"!==g(n)&&(r=n,n=void 0),{url:e,data:t,success:n,dataType:r}}function p(e,t){var n={1:function(e){return"object"===g(e[0])?e[0]:{url:e[0]}},2:function(e){var t=g(e[1]),n={url:e[0]};return"function"===t?n.success=e[1]:n.props=e[1],n},3:function(e){var t=g(e[2]),n={url:e[0],success:e[1]};return"function"===t?n.error=e[2]:n.props=e[2],n},4:function(e){return{url:e[0],success:e[1],error:e[2],props:e[3]}}};return[n[e](t)]}function d(e){"array"!==g(e)&&(e=p(arguments.length,arguments)),V(e,function(e,t){var n=s(E,e);h(n.url,n.success,n.error,n.props)})}function h(e,t,n,r){function o(e){if(e.onload=e.onerror=null,!u){for(var t in e)delete e[t];a.removeChild(e)}}var u=b.test(e),s="SCRIPT",i={type:"text/javascript",async:!0,src:e},a=document.head;u&&(s="LINK",i={rel:"stylesheet",href:e});var l=document.createElement(s);l.onload=l.onerror=function(e){"load"===e.type?t(e):n(e),o(l),l=null},y(l,y(r,i)),a.insertBefore(l,a.firstChild)}function v(e){e.data&&"string"!==g(e.data)&&(e.data=Vue.util.param(e.data)),e.data&&"get"===e.type.toLocaleLowerCase()&&(e.url=m(e.url,e.data),e.data=void 0)}function m(e,t){return""===t?e:(e+"&"+t).replace(/[&?]{1,2}/,"?")}var y=Vue.util.extend,x=Vue.util.NOOP,g=Vue.util.type,V=Vue.util.each;Vue.ajaxSettings={type:"GET",url:location.href,data:"",dataType:"json",cache:!0,async:!0,username:null,password:null,contentType:null,xhrFields:null,context:null,timeout:0,xhr:function(){return new window.XMLHttpRequest},dataFilter:null,beforeSend:x,complete:x,success:x,error:x};var j=/^\s*$/,w={error:function(e,t,n,r){var o=r.context;r.error.call(o,n,t,e)},success:function(e,t,n){var r=n.context;n.success.call(r,e,"success",t)},beforeSend:function(e,t){var n=t.context;return t.beforeSend.call(n,e,t)===!1?!1:void 0}},E={url:"",success:x,error:x,props:{}},b=/\.css(?:\?|$)/i;n(Vue)},function(e,t){function n(){o=!0,r.removeEventListener(s,n,!1);for(var e;e=i.shift();)e(Vue)}var r=document,o=!1,u=/complete|loaded|interactive/,s="DOMContentLoaded",i=[];u.test(r.readyState)?setTimeout(n,1):r.addEventListener(s,n,!1),Vue.ready=function(e){o?e(Vue):i.push(e)},Vue.vueExpose=Vue.vueExpose||[],Vue.vueExpose.push("ready"),console.log("[ Vuejs < domReady module > installation success! ]")},function(e,t){function n(e){e.util.each=r,e.util.type=u,e.util.NOOP=o,e.vueExpose=e.vueExpose||[],e.vueExpose.push.apply(e.vueExpose,["util.noop","util.each","util.type"]),console.log("[ Vuejs < plugins module > installation success! ]")}function r(e,t){if(e){if(e.forEach)return e.forEach(t);for(var n in e)if(e.hasOwnProperty(n)&&t(e[n],n,e)===!1)break}}function o(){}function u(e){return Object.prototype.toString.call(e).replace(/\[\object|\]|\s/gi,"").toLowerCase()}n(Vue)}]);
+/******/ (function(modules) { // webpackBootstrap
+/******/ 	// The module cache
+/******/ 	var installedModules = {};
+
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+
+/******/ 		// Check if module is in cache
+/******/ 		if(installedModules[moduleId])
+/******/ 			return installedModules[moduleId].exports;
+
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = installedModules[moduleId] = {
+/******/ 			exports: {},
+/******/ 			id: moduleId,
+/******/ 			loaded: false
+/******/ 		};
+
+/******/ 		// Execute the module function
+/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+
+/******/ 		// Flag the module as loaded
+/******/ 		module.loaded = true;
+
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+
+
+/******/ 	// expose the modules object (__webpack_modules__)
+/******/ 	__webpack_require__.m = modules;
+
+/******/ 	// expose the module cache
+/******/ 	__webpack_require__.c = installedModules;
+
+/******/ 	// __webpack_public_path__
+/******/ 	__webpack_require__.p = "";
+
+/******/ 	// Load entry module and return exports
+/******/ 	return __webpack_require__(0);
+/******/ })
+/************************************************************************/
+/******/ ([
+/* 0 */
+/***/ function(module, exports, __webpack_require__) {
+
+	/**
+	 * @file
+	 * @fileoverview
+	 * @authors      zhangtao23
+	 * @date         2015/10/4
+	 * @version      1.0.0
+	 * @note
+	 */
+
+	/* global module */
+
+	'use strict';
+	__webpack_require__( 1 );
+	__webpack_require__( 2 );
+	__webpack_require__( 3 );
+	__webpack_require__( 4 );
+
+	// �ֶ�����
+	Vue.vueExpose = Vue.vueExpose.sort();
+
+/***/ },
+/* 1 */
+/***/ function(module, exports) {
+
+	/**
+	 * @file
+	 * @fileoverview each / type / noop
+	 * @authors      litson.zhang@gmail.com
+	 * @date         2015.08.18
+	 * @version      1.0.5
+	 * @note         ajax 模块单拎出来
+	 */
+
+	/* global Vue */
+
+	// ==================== Bound to global Vue ==================== //
+
+	function install( Vue ) {
+
+	    Vue.util.each = each;
+	    Vue.util.type = type;
+	    Vue.util.NOOP = noop;
+
+	    // 将Vue-plugin的API签名打包到vueExpose中，方便作者查看
+	    Vue.vueExpose = Vue.vueExpose || [];
+	    Vue.vueExpose.push.apply( Vue.vueExpose, [
+	        'util.noop',
+	        'util.each',
+	        'util.type'
+	    ] );
+
+	    console.log( '[ Vuejs < plugins module > installation success! ]' );
+	}
+
+	/**
+	 * ref: http://devdocs.io/javascript/global_objects/array/foreach
+	 *
+	 * The each() method executes a provided function once per array or object literal element.
+	 *
+	 * 原生 forEach 在 return false 后会自动 break,这里对象字面量的循环延续该特性.
+	 *
+	 * @param elements
+	 * @param callBack
+	 */
+	function each( elements, callBack ) {
+	    if ( !elements ) {
+	        return;
+	    }
+
+	    if ( elements.forEach ) {
+	        return elements.forEach( callBack );
+	    }
+
+	    for ( var key in elements ) {
+	        if ( elements.hasOwnProperty( key ) && callBack( elements[ key ], key, elements ) === false ) {
+	            break;
+	        }
+	    }
+
+	}
+
+	/**
+	 * Do nothing.
+	 */
+	function noop() {
+	}
+
+	/**
+	 * Get data type
+	 * @param object
+	 * @returns {string}
+	 */
+	function type( object ) {
+	    return Object.prototype.toString.call( object ).replace( /\[\object|\]|\s/gi, '' ).toLowerCase();
+	}
+
+	// install it.
+	install( Vue );
+
+/***/ },
+/* 2 */
+/***/ function(module, exports) {
+
+	/**
+	 * @file
+	 * @fileoverview Vue ajax
+	 * @authors      litson.zhang@gmail.com
+	 * @date         2015.08.18
+	 * @version      1.0.7.1
+	 * @note
+	 */
+
+	/* global Vue */
+
+
+	// ==================== Bound to global Vue ==================== //
+
+	function install( Vue ) {
+
+	    Vue.util.param = param;
+	    Vue.ajax       = ajax;
+	    Vue.get        = ajaxGet;
+	    Vue.post       = ajaxPost;
+	    Vue.loadFile   = loadFile;
+	    Vue.getJSON    = ajaxGetJSON;
+
+	    // 将Vue-plugin的API签名打包到vueExpose中，方便作者查看
+	    Vue.vueExpose = Vue.vueExpose || [];
+	    Vue.vueExpose.push.apply( Vue.vueExpose, [
+	        'ajaxSetting',
+	        'util.param',
+	        'ajax',
+	        'post',
+	        'get',
+	        'loadFile',
+	        'getJSON'
+	    ] );
+
+	    console.log( '[ Vuejs < ajax module > installation success! ]' );
+	}
+
+	var extend  = Vue.util.extend;
+	var noop    = Vue.util.NOOP;
+	var type    = Vue.util.type;
+	var forEach = Vue.util.each;
+
+	/**
+	 *
+	 * 序列化参数
+	 *
+	 * @param elements
+	 * @param traditional
+	 * @returns {string}
+	 */
+	function param( elements, traditional ) {
+
+	    var result = [];
+	    result.add = function ( item, key ) {
+
+	        // If value is a function, invoke it and return its value
+	        if ( 'function' === type( item ) ) {
+	            item = item();
+	        }
+
+	        if ( null == item ) {
+	            item = '';
+	        }
+
+	        result[result.length] = encodeURIComponent( key ) + '=' + encodeURIComponent( item );
+
+	    };
+
+	    // http://www.w3school.com.cn/jquery/ajax_param.asp
+	    _buildParam( result, elements, traditional );
+
+	    return result.join( '&' ).replace( /%20/g, '+' );
+	}
+
+	/**
+	 *
+	 * 处理多纬数组
+	 *
+	 * E.g
+	 *
+	 * var params = {
+	     *
+	     *      items: {  testBbject: 1 },
+	     *      test2: [1, 2, 3]
+	     *
+	     * }
+	 *
+	 * Use jQuery or Zepto:
+	 *      decodeURIComponent( $.param( params ) );
+	 *      // output: items[testBbject]=1&test2[]=1&test2[]=3&test2[]=4
+	 *
+	 *
+	 * Use Vue.util.param
+	 *      decodeURIComponent( Vue.util.param( params ) );
+	 *      // output: items[testBbject]=1&test2[]=1&test2[]=3&test2[]=4
+	 *
+	 *
+	 *
+	 *
+	 * @param params
+	 * @param elements
+	 * @param traditional
+	 * @param prefix
+	 * @private
+	 */
+	function _buildParam( params, elements, traditional, prefix ) {
+
+	    var isPlainObject = 'object' === type( elements );
+
+	    forEach( elements, function ( item, key ) {
+
+	        var _type          = type( item );
+	        var _isPlainObject = 'object' === _type;
+	        var _isArray       = 'array' === _type;
+
+	        if ( prefix ) {
+
+	            if ( traditional ) {
+	                key = prefix;
+	            } else {
+	                key =
+	                    [
+	                        prefix
+	                        , '['
+	                        , (isPlainObject || _isPlainObject || _isArray) ? key : ''
+	                        , ']'
+	                    ].join( '' );
+	            }
+	        }
+
+	        /**
+	         * 因为这里不需要对form DOM 做扫描
+	         * 所以和 $.param 不同的是，去掉了 serializeArray 的format
+	         */
+	        if ( _isArray || (!traditional && _isPlainObject) ) {
+	            _buildParam( params, item, traditional, key );
+	        } else {
+	            params.add( item, key );
+	        }
+
+	    } );
+
+	}
+
+	// Vue Ajax Default Options.
+	Vue.ajaxSettings = {
+	    type       : 'GET',
+	    url        : location.href,
+	    data       : '',
+	    dataType   : 'json',
+	    cache      : true,
+	    async      : true,
+	    username   : null,
+	    password   : null,
+	    contentType: null,
+	    xhrFields  : null,
+	    context    : null,
+	    timeout    : 0,
+	    xhr        : function () {
+	        return new window.XMLHttpRequest()
+	    },
+	    // 9月15日更新，加入dataFilter
+	    dataFilter : null,
+	    beforeSend : noop,
+	    complete   : noop,
+	    success    : noop,
+	    error      : noop
+	};
+
+	var blankRE = /^\s*$/;
+
+	/**
+	 *
+	 *
+	 *
+	 *
+	 * @version 1.0.0 lite版ajax接口
+	 *
+	 *
+	 *
+	 * @param options
+	 */
+	function ajax( options ) {
+
+	    var hashIndex;
+	    var dataType;
+	    var xhr;
+	    var abortTimer;
+	    var hasPlaceholder;
+	    var protocol = /^([\w-]+:)\/\//.test( options.url ) ? RegExp.$1 : window.location.protocol;
+
+	    _mergeExceptUndefined( Vue.ajaxSettings, options );
+
+	    if ( !options.crossDomain ) {
+	        options.crossDomain =
+	            /^([\w-]+:)?\/\/([^\/]+)/.test( options.url )
+	            && RegExp.$2 != window.location.host;
+	    }
+
+
+	    // 过滤掉hash
+	    hashIndex = options.url.indexOf( '#' );
+
+	    if ( hashIndex > -1 ) {
+	        options.url = options.url.slice( 0, hashIndex );
+	    }
+
+	    // 将参数附件在url上
+	    serializeData( options );
+
+	    dataType = options.dataType;
+
+	    // 双问号存在，说明为jsonp请求
+	    hasPlaceholder = /\?.+=\?/.test( options.url );
+	    if ( hasPlaceholder ) {
+	        dataType = 'jsonp';
+	    }
+
+	    // ajax cache
+	    if (
+	        !options.cache
+	        || 'script' === dataType
+	        || 'jsonp' === dataType
+	    ) {
+	        options.url = appendQuery( options.url, '_t=' + +new Date );
+	    }
+
+	    // 不走 xhr + eval 的加载脚本方式，改为外联。保证没有跨域问题,而且性能上成
+	    if ( 'script' === dataType ) {
+	        // options.timeout && console.log('Sorry, dataType == script 暂不支持timeout');
+	        return Vue.loadFile( {
+	            url    : options.url,
+	            success: function () {
+	                _ajaxHelpers.success( null, null, options );
+	            },
+	            error  : function ( event ) {
+	                _ajaxHelpers.error( event, 'error', null, options );
+	            },
+	            props  : {}
+	        } );
+	    }
+
+	    // jsonp
+	    if ( 'jsonp' === dataType ) {
+	        return jsonPadding( options );
+	    }
+
+	    // xhr 实例
+	    xhr = options.xhr();
+
+	    var headers = extend( {}, options.headers || {} );
+
+	    if ( !options.crossDomain ) {
+	        headers['X-Requested-With'] = 'XMLHttpRequest';
+	    }
+
+	    if (
+	        options.contentType
+	        ||
+	        ( options.data && options.type.toUpperCase() != 'GET' )
+	    ) {
+	        headers['Content-Type'] = options.contentType || 'application/x-www-form-urlencoded';
+	    }
+
+	    xhr['onreadystatechange'] = function () {
+
+	        if ( xhr.readyState === 4 ) {
+	            xhr['onreadystatechange'] = noop;
+	            clearTimeout( abortTimer );
+
+	            var result;
+	            var error = false;
+
+	            if ( (xhr.status >= 200 && xhr.status < 300) || xhr.status == 304 || (xhr.status == 0 && protocol == 'file:') ) {
+
+	                result = xhr.responseText;
+
+	                // jQuery 有 converters 集合，这里从实现上没有这么做，可能会有些问题无法捕获
+	                if ( 'function' === type( options.dataFilter ) ) {
+
+	                    result = options.dataFilter( result, dataType );
+
+	                } else {
+
+	                    try {
+	                        if ( 'xml' === dataType ) {
+	                            result = xhr.responseXML;
+	                        }
+
+	                        if ( 'json' === dataType ) {
+	                            result = blankRE.test( result ) ? null : JSON.parse( result + '' );
+	                        }
+	                    } catch ( ex ) {
+	                        error = ex;
+	                    }
+	                }
+
+	                if ( error ) {
+	                    _ajaxHelpers.error( error, 'parsererror', xhr, options );
+	                } else {
+	                    _ajaxHelpers.success( result, xhr, options );
+	                }
+
+	            } else {
+	                _ajaxHelpers.error( xhr.statusText || null, xhr.status ? 'error' : 'abort', xhr, options );
+	            }
+	        }
+	    };
+
+	    if ( false === _ajaxHelpers.beforeSend( xhr, options ) ) {
+	        xhr.abort();
+	        _ajaxHelpers.error( null, 'abort', xhr, options );
+	        return xhr;
+	    }
+
+	    // xhr 额外字段
+	    if ( options.xhrFields ) {
+	        forEach( options.xhrFields, function ( item, key ) {
+	            xhr[key] = item;
+	        } );
+	    }
+
+	    // open
+	    xhr.open( options.type.toUpperCase(), options.url, options.async, options.username, options.password );
+
+	    // 请求头设置，一次性push
+	    forEach( headers, function ( item, key ) {
+	        xhr.setRequestHeader( key, item );
+	    } );
+
+	    // ajax timeout
+	    if ( options.timeout > 0 ) {
+
+	        abortTimer = setTimeout( function () {
+	            xhr.onreadystatechange = noop;
+	            xhr.abort();
+	            _ajaxHelpers.error( null, 'timeout', xhr, options );
+	        }, options.timeout );
+	    }
+
+	    xhr.send( options.data );
+
+	    return xhr;
+	}
+
+	var _ajaxHelpers = {
+	    error     : function ( error, type, xhr, options ) {
+	        var context = options.context;
+	        options.error.call( context, xhr, type, error );
+	    },
+	    success   : function ( data, xhr, options ) {
+	        var context = options.context;
+
+
+	        options.success.call( context, data, 'success', xhr );
+	    },
+	    beforeSend: function ( xhr, options ) {
+	        var context = options.context;
+	        if ( options.beforeSend.call( context, xhr, options ) === false ) {
+	            return false;
+	        }
+	    }
+	};
+
+	/**
+	 * 去掉undefined的属性
+	 * merge
+	 *
+	 * @param from
+	 * @param to
+	 * @returns {*}
+	 * @private
+	 */
+	function _mergeExceptUndefined( from, to ) {
+	    forEach( from, function ( item, key ) {
+	        if ( to[key] === undefined ) {
+	            to[key] = item;
+	        }
+	    } );
+
+	    return to;
+	}
+
+	/**
+	 *
+	 *
+	 * Ajax, method 'get'.
+	 *
+	 * Vue.get( url [, data ] [, success(data, textStatus, XHR) ] [, dataType ] )
+	 *
+	 * @param url
+	 * @param data
+	 * @param success
+	 * @param dataType
+	 */
+	function ajaxGet( /* url, data, success, dataType */ ) {
+	    return Vue.ajax( _paramParser.apply( null, arguments ) );
+	}
+
+	/**
+	 *
+	 * Ajax, method 'post'.
+	 *
+	 * Vue.post( url [, data ] [, success(data, textStatus, XHR) ] [, dataType ] )
+	 *
+	 * @param url
+	 * @param data
+	 * @param success
+	 * @param dataType
+	 */
+	function ajaxPost( /* url, data, success, dataType */ ) {
+	    var options  = _paramParser.apply( null, arguments );
+	    options.type = 'post';
+	    return Vue.ajax( options );
+	}
+
+	/**
+	 *
+	 * Ajax, method 'JSON'.
+	 *
+	 * Vue.getJSON( url [, data ] [, success(data, textStatus, XHR) ] [, dataType ] )
+	 *
+	 * @param url
+	 * @param data
+	 * @param success
+	 * @param dataType
+	 */
+	function ajaxGetJSON( /* url, data, success, dataType */ ) {
+	    var options      = _paramParser.apply( null, arguments );
+	    options.dataType = 'json';
+	    return Vue.ajax( options );
+	}
+
+	/**
+	 * jsonp函数
+	 * @param options
+	 * @returns {*}
+	 */
+	function jsonPadding( options ) {
+
+	    // 黑魔法~
+	    var callbackName = options.jsonpCallback || 'jsonp' + setTimeout( '1' );
+	    var responseData;
+	    var abortTimeout;
+
+	    // 失败或成功后的回调
+	    function callBack( event ) {
+	        clearTimeout( abortTimeout );
+
+	        if ( event.type === 'error' || !responseData ) {
+	            _ajaxHelpers.error( null, 'error', {abort: noop}, options );
+	        } else {
+	            _ajaxHelpers.success( responseData[0], {abort: noop}, options );
+	        }
+	    }
+
+	    // 文件下载完成后，将返回值缓存起来
+	    window[callbackName] = function () {
+	        responseData = arguments;
+	    };
+
+	    if ( options.timeout > 0 ) {
+	        abortTimeout = setTimeout( function () {
+	            _ajaxHelpers.error( null, 'timeout', {abort: noop}, options );
+	        }, options.timeout );
+	    }
+
+	    return Vue.loadFile( {
+	        url    : options.url.replace( /\?(.+)=\?/, '?$1=' + callbackName ),
+	        success: callBack,
+	        error  : callBack
+	    } );
+	}
+
+	/**
+	 *
+	 * override
+	 *
+	 * @param url
+	 * @param data
+	 * @param success
+	 * @param dataType
+	 * @returns {{XMLHttpRequest}}
+	 * @private
+	 */
+	function _paramParser( url, data, success, dataType ) {
+
+	    if ( 'function' === type( data ) ) {
+	        dataType = success;
+	        success  = data;
+	        data     = undefined;
+	    }
+
+	    if ( 'function' !== type( success ) ) {
+	        dataType = success;
+	        success  = undefined;
+	    }
+
+	    return {
+	        url     : url,
+	        data    : data,
+	        success : success,
+	        dataType: dataType
+	    }
+	}
+
+	var _loadFileDefaultSetting = {
+	    url    : '',
+	    success: noop,
+	    error  : noop,
+	    props  : {}
+	};
+
+	var IS_CSS_RE = /\.css(?:\?|$)/i;
+
+	/**
+	 *
+	 *
+	 *
+	 * @param argsLength
+	 * @param arguments
+	 * @private
+	 */
+	function _loadFileArgsParser( length, args ) {
+
+	    // 1. url success error props
+	    // 2. url success error
+	    // 3. url success props
+	    // 4. url success
+	    // 5. url props
+	    // 6. url
+	    // 7. { url, success, error, props }
+
+	    var argsMapping = {
+	        /**
+	         *
+	         * {
+	             *      url,
+	             *      success,
+	             *      error,
+	             *      props
+	             * }
+	         *
+	         * or
+	         *
+	         * url
+	         *
+	         * @param args
+	         * @returns {object}
+	         */
+	        1: function ( args ) {
+
+	            if ( 'object' === type( args[0] ) ) {
+	                return args[0];
+	            }
+
+	            return {
+	                url: args[0]
+	            }
+	        },
+
+	        // url success || url props
+	        2: function ( args ) {
+
+	            var _type  = type( args[1] );
+	            var result = {
+	                url: args[0]
+	            };
+
+	            if ( 'function' === _type ) {
+	                result.success = args[1];
+	            } else {
+	                result.props = args[1];
+	            }
+
+	            return result;
+	        },
+
+	        // url success error || url success props
+	        3: function ( args ) {
+
+	            var _type  = type( args[2] );
+	            var result = {
+	                url    : args[0],
+	                success: args[1]
+	            };
+
+
+	            if ( 'function' === _type ) {
+	                result.error = args[2];
+	            } else {
+	                result.props = args[2];
+	            }
+
+	            return result;
+	        },
+
+	        // url success error props
+	        4: function ( args ) {
+	            return {
+	                url    : args[0],
+	                success: args[1],
+	                error  : args[2],
+	                props  : args[3]
+	            }
+	        }
+	    };
+
+	    return [argsMapping[length]( args )];
+	}
+
+	/**
+	 *
+	 * 下载文件
+	 *
+	 *
+	 * e.g
+	 *
+	 *
+	 *      Args: url , onSuccess , onError , props
+	 *      1. loadFile(
+	 *                '//cdn.domain.cn/js/main.js' ,
+	 *              , function() { console.log('callBack') }
+	 *              , function() { console.log('Error happen!') }
+	 *              , { id: 'mainjs' }
+	 *         );
+	 *
+	 *
+	 *      Args: load a file list.
+	 *      2. loadFile( [
+	 *
+	 *          {
+	     *              url      : '//cdn.domain.cn/js/main.js',
+	     *              success  : function(){ console.log('callBack for url : //cdn.domain.cn/js/main.js ') },
+	     *              props    : {
+	     *                              id     : 'mainjs',
+	     *                              appKey : 'aJKckjkjdklaj2jJKssdIk'
+	     *                         }
+	     *          },
+	 *
+	 *          {
+	     *              url      : '//cdn.domain.cn/css/normalize.css',
+	     *              success  : function(){ console.log('callBack for url : //cdn.domain.cn/css/normalize.css ') }
+	     *          }
+	 *
+	 *      ] );
+	 *
+	 *
+	 *
+	 * @param filelist
+	 */
+	function loadFile( filelist ) {
+
+	    if ( 'array' !== type( filelist ) ) {
+	        filelist = _loadFileArgsParser( arguments.length, arguments );
+	    }
+
+	    forEach( filelist, function ( item, key ) {
+
+	        var temp = _mergeExceptUndefined(
+	            _loadFileDefaultSetting
+	            , item
+	        );
+
+	        _loadFile( temp.url, temp.success, temp.error, temp.props );
+
+	    } );
+	}
+
+	/**
+	 *
+	 * load file
+	 *
+	 * @param url
+	 * @param success
+	 * @param error
+	 * @param props
+	 * @private
+	 */
+	function _loadFile( url, success, error, props ) {
+
+	    var isCss        = IS_CSS_RE.test( url );
+	    var nodeName     = 'SCRIPT';
+	    var defaultProps = {
+	        type : 'text/javascript',
+	        async: true,
+	        src  : url
+	    };
+
+	    var header = document.head;
+
+	    if ( isCss ) {
+	        nodeName     = 'LINK';
+	        defaultProps = {
+	            rel : 'stylesheet',
+	            href: url
+	        }
+	    }
+
+	    var node = document.createElement( nodeName );
+
+	    // 合二为一
+	    node.onload = node.onerror = function ( event ) {
+	        (event.type === 'load') ? success( event ) : error( event );
+	        _clean( node );
+	        node = null;
+	    };
+
+	    extend(
+	        node,
+	        extend( props, defaultProps )
+	    );
+
+	    header.insertBefore( node, header.firstChild );
+
+	    function _clean( node ) {
+	        node.onload = node.onerror = null;
+
+	        // Css 文件在文档中被移除后，样式会更随丢失
+	        if ( isCss ) {
+	            return;
+	        }
+
+	        for ( var p in node ) {
+	            delete node[p];
+	        }
+
+	        header.removeChild( node );
+	    }
+	}
+
+	/**
+	 * Serialize data to string.
+	 *
+	 * @param options
+	 */
+	function serializeData( options ) {
+	    if ( options.data && type( options.data ) !== 'string' ) {
+	        options.data = Vue.util.param( options.data );
+	    }
+
+	    if ( options.data && options.type.toLocaleLowerCase() === 'get' ) {
+	        options.url  = appendQuery( options.url, options.data );
+	        options.data = undefined;
+	    }
+	}
+
+	/**
+	 * url后附加query string
+	 *
+	 * @param url
+	 * @param query
+	 * @returns {string}
+	 */
+	function appendQuery( url, query ) {
+	    return (query === '') ? url : (url + '&' + query).replace( /[&?]{1,2}/, '?' );
+	}
+
+	// install it.
+	install( Vue );
+
+/***/ },
+/* 3 */
+/***/ function(module, exports) {
+
+	/**
+	 * @file
+	 * @fileoverview DOM ready for Vue
+	 * @authors      litson.zhang@gmail.com
+	 * @date         2015.08.18
+	 * @version      1.0
+	 * @note
+	 */
+
+	/* global Vue */
+
+	var doc       = document;
+	var isReady   = false;
+	var readyRE   = /complete|loaded|interactive/;
+	var eventType = 'DOMContentLoaded';
+
+	var callBacks = [];
+
+	if ( readyRE.test( doc[ 'readyState' ] ) ) {
+	    setTimeout( fireEvent, 1 );
+	} else {
+	    doc.addEventListener( eventType, fireEvent, false );
+	}
+
+	function fireEvent() {
+
+	    isReady = true;
+	    doc.removeEventListener( eventType, fireEvent, false );
+
+	    var fn;
+	    while ( fn = callBacks.shift() ) {
+	        fn( Vue );
+	    }
+	}
+
+	/**
+	 * Dom ready for Vue. bind to global Vue.
+	 *
+	 * E.g.
+	 *
+	 *      Vue.ready( function( Vue ) { console.log('Ready!',Vue); } );
+	 *
+	 * @param fn
+	 */
+	Vue.ready = function ( fn ) {
+
+	    if ( isReady ) {
+	        fn( Vue );
+	    } else {
+	        callBacks.push( fn );
+	    }
+
+	};
+
+	// 将Vue-plugin的API签名打包到vueExpose中，方便作者查看
+	Vue.vueExpose = Vue.vueExpose || [];
+	Vue.vueExpose.push( 'ready' );
+
+	console.log( '[ Vuejs < domReady module > installation success! ]' );
+
+/***/ },
+/* 4 */
+/***/ function(module, exports) {
+
+	/**
+	 * @file
+	 * @fileoverview 简版的jQuery操作，不要妄想和jQuery一样。。
+	 *               实际上是对原有Vue.util提供的dom操作做了封装，并追加一些常用API
+	 *               因此，无法实现jquery中所有事务皆为jquery实例的实现，
+	 *               例如比较典型的一个问题，$(fn) == $(document).ready(fn) 中返回值问题，jq为递归操作，而vQuery只能调用Vue.ready，
+	 *               并返回实例原形。（因此我也是去掉了该重载方式的实现）
+	 *
+	 * @authors      zhangtao23
+	 * @date         2015/9/29
+	 * @version      1.0.0
+	 * @note
+	 */
+
+	/* global module */
+	/* global Vue */
+
+	'use strict';
+
+	// ==================== Bound to global Vue ==================== //
+
+	function install( Vue ) {
+	    Vue.$ = vQuery;
+	    // 将Vue-plugin的API签名打包到vueExpose中，方便作者查看
+	    Vue.vueExpose = Vue.vueExpose || [];
+	    Vue.vueExpose.push( '$' );
+
+	    console.log( '[ Vuejs < Vue $ module > installation success! ]' );
+	}
+	// ==================== vQuery ==================== //
+
+	var doc = document;
+
+	var makeArray = function ( arrayLike ) {
+	    return Array.prototype.slice.call( arrayLike, 0 );
+	};
+
+	var vQuery = function ( selecter ) {
+	    return new vQuery.fn.init( selecter );
+	};
+
+	/**
+	 * ========= API集合 #start =========
+	 *
+	 * 注意：这只是简化库，我在写的时候几乎放弃了所有异常检测，
+	 *      他肯定没有jquery 、Zepto那么健壮，但是我们需要的就是lite版本，
+	 *      做太多hack反而违背了初衷。
+	 */
+	var proto = {
+	    constructor: vQuery,
+	    init: function ( selecter ) {
+	        var self = this;
+	        var dom = [];
+
+	        if ( !selecter ) {
+	            return dom;
+	        }
+
+	        // element || window
+	        if (
+	            selecter.nodeType
+	            || (typeof selecter === 'object' && 'setInterval' in selecter)
+	        ) {
+	            dom = [ selecter ];
+	        }
+
+	        // selector
+	        if ( typeof selecter === 'string' ) {
+	            dom = makeArray( doc.querySelectorAll( selecter ), 0 );
+	        }
+
+	        Vue.util.each(
+	            dom,
+	            function ( item, index ) {
+	                self[ index ] = item;
+	            }
+	        );
+
+	        self.length = dom.length;
+	        dom.__proto__ = vQuery.fn;
+	        return dom;
+
+	    },
+	    length: 0
+	};
+
+	Vue.util.extend( proto, {
+	    size: function () {
+	        return this.length;
+	    },
+
+	    addClass: function ( value ) {
+	        var length = this.length;
+	        while ( length-- ) {
+	            Vue.util.addClass( this[ length ], value );
+	        }
+	        return this;
+	    },
+	    removeClass: function ( value ) {
+	        var length = this.length;
+	        while ( length-- ) {
+	            Vue.util.removeClass( this[ length ], value );
+	        }
+	        return this;
+	    },
+
+	    remove: function () {
+	        var length = this.length;
+	        while ( length-- ) {
+	            Vue.util.remove( this[ length ] );
+	        }
+	        return this;
+	    },
+
+	    // Vue不同版本处理不一样，早些版本是attr自动加Vue.config中的前缀，
+	    // 1.0版本后才去掉了前缀，所以干脆这里重新实现了。
+	    attr: function ( name, value ) {
+	        if ( value == undefined ) {
+	            return this[ 0 ].getAttribute( name );
+	        }
+	        var length = this.length;
+	        while ( length-- ) {
+	            this[ length ].setAttribute( name, value );
+	        }
+	        return this;
+	    },
+	    removeAttr: function ( name ) {
+	        var length = this.length;
+	        while ( length-- ) {
+	            this[ length ].removeAttribute( name );
+	        }
+	        return this;
+	    },
+
+	    // 警告：大量的innerHtml会报错，jq中有fallback，将其打成元素append，这里很松散的没有做处理
+	    //      数据量大时谨慎调用。
+	    //      实验结果是，innerHTML对行数有限制，大于某阙值将溢出。
+	    html: function ( value ) {
+	        if ( value == undefined ) {
+	            return this[ 0 ].innerHTML;
+	        }
+	        var length = this.length;
+	        while ( length-- ) {
+	            this[ length ].innerHTML = value;
+	        }
+	        return this;
+	    },
+
+	    // show & hide 没有对之前的显示方式缓存，采用比较基础的切换display的方式。
+	    show: function () {
+	        return this.css( 'display', '' );
+	    },
+	    hide: function () {
+	        return this.css( 'display', 'none' );
+	    },
+
+	    // 警告：这里处理太多 jQuery.style api 的实现会很重，因此没有过多处理（其实是写了的，后来感觉违背本意，删除了大部分逻辑）
+	    //      所以希望开发者自我约束传入单位
+	    css: function ( name, value ) {
+
+	        var length = this.length;
+
+	        function parseUnit( number ) {
+	            return typeof number === 'number' ? number + 'px' : number;
+	        }
+
+	        if ( Vue.util.isPlainObject( name ) ) {
+
+	            var cssText = [ '' ];
+	            Vue.util.each( name, function ( item, key ) {
+	                cssText.push(
+	                    key + ':' + parseUnit( item )
+	                )
+	            } );
+	            cssText.push( '' );
+	            cssText = cssText.join( ';' );
+
+	            while ( length-- ) {
+	                this[ length ].style.cssText += cssText;
+	            }
+
+	        } else {
+	            name = Vue.util.camelize( name );
+
+	            if ( value == undefined ) {
+	                return window.getComputedStyle( this[ 0 ], null )[ name ];
+	            } else {
+	                while ( length-- ) {
+	                    this[ length ].style[ name ] = parseUnit( value );
+	                }
+	            }
+	        }
+
+	        return this;
+	    },
+
+	    // on & off，event这块单独拎出来都是大学问，纠结了很久，决定还是放弃jquery中维护event 存储对象的方式
+	    // 依然简陋的实现，稍微有点成绩的，就是批量绑定吧
+	    on: function ( type, fn ) {
+	        var length = this.length;
+	        while ( length-- ) {
+	            Vue.util.on( this[ length ], type, fn );
+	        }
+	        return this;
+	    },
+	    off: function ( type, fn ) {
+	        var length = this.length;
+	        while ( length-- ) {
+	            Vue.util.off( this[ length ], type, fn );
+	        }
+	        return this;
+	    }
+	} );
+
+	// width & height;
+	// 没有特别对document、window等等做处理，一般情况下用不到
+	// 继续保持轻量
+	Vue.util.each( [ 'width', 'height' ], function ( key ) {
+
+	    proto[ key ] = function ( value ) {
+
+	        if ( value ) {
+	            return this.css( key, typeof value === 'string' ? value : value + 'px' );
+	        }
+
+	        return this[ 0 ].getBoundingClientRect()[ key ];
+	    }
+
+	} );
+
+	/* ========= API集合 #end ========= */
+
+	// 原形变换
+	vQuery.fn = vQuery.prototype = proto;
+	vQuery.fn.init.prototype = vQuery.fn;
+
+	// install
+	install( Vue );
+
+/***/ }
+/******/ ]);
