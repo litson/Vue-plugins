@@ -1,11 +1,11 @@
 #Vue plugins
 
 ## NOTE:
-注意！目前仅支持1.0.7及以下版本。改造中
 
-TODO:
-    1、迁到webpack后并没有对代码做系拆分，需要重新拆分；
-    2、定制化
+2016-01-25 修复了Vue 1.0.13 中冻结util属性导致功能不可用的问题。
+            Vuep 曝露方法从 Vue.util中迁移到 Vue.plugin 中
+
+
 
 
 ### API
