@@ -16,19 +16,10 @@
 /* global Vue */
 
 'use strict';
-
-// ==================== Bound to global Vue ==================== //
-
-Vue.use( {
-    install: function ( Vue ) {
-        Vue.$ = vQuery;
-    }
-} );
-
 // ==================== vQuery ==================== //
 
 var doc  = document;
-var each = Vue.plugin.each;
+var each = require( './each' );
 
 var makeArray = function ( arrayLike ) {
     return Array.prototype.slice.call( arrayLike, 0 );
@@ -83,7 +74,7 @@ var proto = {
     length     : 0
 };
 
-Vue.plugin.extend( proto, {
+Vue.util.extend( proto, {
     size: function () {
         return this.length;
     },
@@ -232,3 +223,5 @@ each( ['width', 'height'], function ( key ) {
 // 原形变换
 vQuery.fn = vQuery.prototype = proto;
 vQuery.fn.init.prototype = vQuery.fn;
+
+module.exports = vQuery;

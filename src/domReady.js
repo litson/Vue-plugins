@@ -8,13 +8,6 @@
  */
 
 /* global Vue */
-
-Vue.use( {
-    install: function ( Vue ) {
-        Vue.ready = ready;
-    }
-} );
-
 var doc       = document;
 var isReady   = false;
 var readyRE   = /complete|loaded|interactive/;
@@ -48,11 +41,10 @@ function fireEvent() {
  *
  * @param fn
  */
-function ready( fn ) {
+module.exports = function ( fn ) {
     if ( isReady ) {
         fn( Vue );
     } else {
         callBacks.push( fn );
     }
-
-}
+};
