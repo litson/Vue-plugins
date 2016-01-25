@@ -1,5 +1,9 @@
 #Vue plugins
 
+## NOTE:
+注意！目前仅支持1.0.7及以下版本。改造中
+
+
 ### API
 - Vue.$
 - Vue.ajax
