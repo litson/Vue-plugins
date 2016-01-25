@@ -5,28 +5,23 @@
  * @date         2015.08.18
  * @version      1.0.5
  * @note         ajax 模块单拎出来
+ *               因为Vue版本升级后，启用Object.freeze冻结util中的属性
+ *               （这哥们真有代码洁癖，不知道什么样的人能给丫提PR）,
+ *               所以将插件放在信
  */
 
 /* global Vue */
 
 // ==================== Bound to global Vue ==================== //
-
-function install( Vue ) {
-
-    Vue.util.each = each;
-    Vue.util.type = type;
-    Vue.util.NOOP = noop;
-
-    // 将Vue-plugin的API签名打包到vueExpose中，方便作者查看
-    Vue.vueExpose = Vue.vueExpose || [];
-    Vue.vueExpose.push.apply( Vue.vueExpose, [
-        'util.noop',
-        'util.each',
-        'util.type'
-    ] );
-
-    console.log( '[ Vuejs < plugins module > installation success! ]' );
-}
+Vue.use( {
+    install: function ( Vue ) {
+        Vue.plugin      = Vue.plugin || {};
+        Vue.plugin.each = each;
+        Vue.plugin.type = type;
+        Vue.plugin.NOOP = noop;
+        return Vue;
+    }
+} );
 
 /**
  * ref: http://devdocs.io/javascript/global_objects/array/foreach
@@ -48,7 +43,7 @@ function each( elements, callBack ) {
     }
 
     for ( var key in elements ) {
-        if ( elements.hasOwnProperty( key ) && callBack( elements[ key ], key, elements ) === false ) {
+        if ( elements.hasOwnProperty( key ) && callBack( elements[key], key, elements ) === false ) {
             break;
         }
     }
@@ -69,6 +64,3 @@ function noop() {
 function type( object ) {
     return Object.prototype.toString.call( object ).replace( /\[\object|\]|\s/gi, '' ).toLowerCase();
 }
-
-// install it.
-install( Vue );

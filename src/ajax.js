@@ -3,43 +3,29 @@
  * @fileoverview Vue ajax
  * @authors      litson.zhang@gmail.com
  * @date         2015.08.18
- * @version      1.0.7.1
+ * @version      1.0.7.2
  * @note
+ *      看 plugin.js 的 log~
  */
 
 /* global Vue */
 
-
 // ==================== Bound to global Vue ==================== //
-
-function install( Vue ) {
-
-    Vue.util.param = param;
-    Vue.ajax       = ajax;
-    Vue.get        = ajaxGet;
-    Vue.post       = ajaxPost;
-    Vue.loadFile   = loadFile;
-    Vue.getJSON    = ajaxGetJSON;
-
-    // 将Vue-plugin的API签名打包到vueExpose中，方便作者查看
-    Vue.vueExpose = Vue.vueExpose || [];
-    Vue.vueExpose.push.apply( Vue.vueExpose, [
-        'ajaxSetting',
-        'util.param',
-        'ajax',
-        'post',
-        'get',
-        'loadFile',
-        'getJSON'
-    ] );
-
-    console.log( '[ Vuejs < ajax module > installation success! ]' );
-}
+Vue.use( {
+    install: function ( Vue ) {
+        Vue.plugin.param = param;
+        Vue.ajax         = ajax;
+        Vue.get          = ajaxGet;
+        Vue.post         = ajaxPost;
+        Vue.loadFile     = loadFile;
+        Vue.getJSON      = ajaxGetJSON;
+    }
+} );
 
 var extend  = Vue.util.extend;
-var noop    = Vue.util.NOOP;
-var type    = Vue.util.type;
-var forEach = Vue.util.each;
+var noop    = Vue.plugin.NOOP;
+var type    = Vue.plugin.type;
+var forEach = Vue.plugin.each;
 
 /**
  *
@@ -91,8 +77,8 @@ function param( elements, traditional ) {
  *      // output: items[testBbject]=1&test2[]=1&test2[]=3&test2[]=4
  *
  *
- * Use Vue.util.param
- *      decodeURIComponent( Vue.util.param( params ) );
+ * Use Vue.plugin.param
+ *      decodeURIComponent( Vue.plugin.param( params ) );
  *      // output: items[testBbject]=1&test2[]=1&test2[]=3&test2[]=4
  *
  *
@@ -737,7 +723,7 @@ function _loadFile( url, success, error, props ) {
  */
 function serializeData( options ) {
     if ( options.data && type( options.data ) !== 'string' ) {
-        options.data = Vue.util.param( options.data );
+        options.data = Vue.plugin.param( options.data );
     }
 
     if ( options.data && options.type.toLocaleLowerCase() === 'get' ) {
@@ -756,6 +742,3 @@ function serializeData( options ) {
 function appendQuery( url, query ) {
     return (query === '') ? url : (url + '&' + query).replace( /[&?]{1,2}/, '?' );
 }
-
-// install it.
-install( Vue );

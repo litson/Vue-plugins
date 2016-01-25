@@ -19,17 +19,16 @@
 
 // ==================== Bound to global Vue ==================== //
 
-function install( Vue ) {
-    Vue.$ = vQuery;
-    // 将Vue-plugin的API签名打包到vueExpose中，方便作者查看
-    Vue.vueExpose = Vue.vueExpose || [];
-    Vue.vueExpose.push( '$' );
+Vue.use( {
+    install: function ( Vue ) {
+        Vue.$ = vQuery;
+    }
+} );
 
-    console.log( '[ Vuejs < Vue $ module > installation success! ]' );
-}
 // ==================== vQuery ==================== //
 
-var doc = document;
+var doc  = document;
+var each = Vue.plugin.each;
 
 var makeArray = function ( arrayLike ) {
     return Array.prototype.slice.call( arrayLike, 0 );
@@ -48,9 +47,9 @@ var vQuery = function ( selecter ) {
  */
 var proto = {
     constructor: vQuery,
-    init: function ( selecter ) {
+    init       : function ( selecter ) {
         var self = this;
-        var dom = [];
+        var dom  = [];
 
         if ( !selecter ) {
             return dom;
@@ -61,7 +60,7 @@ var proto = {
             selecter.nodeType
             || (typeof selecter === 'object' && 'setInterval' in selecter)
         ) {
-            dom = [ selecter ];
+            dom = [selecter];
         }
 
         // selector
@@ -69,37 +68,37 @@ var proto = {
             dom = makeArray( doc.querySelectorAll( selecter ), 0 );
         }
 
-        Vue.util.each(
+        each(
             dom,
             function ( item, index ) {
-                self[ index ] = item;
+                self[index] = item;
             }
         );
 
-        self.length = dom.length;
+        self.length   = dom.length;
         dom.__proto__ = vQuery.fn;
         return dom;
 
     },
-    length: 0
+    length     : 0
 };
 
-Vue.util.extend( proto, {
+Vue.plugin.extend( proto, {
     size: function () {
         return this.length;
     },
 
-    addClass: function ( value ) {
+    addClass   : function ( value ) {
         var length = this.length;
         while ( length-- ) {
-            Vue.util.addClass( this[ length ], value );
+            Vue.util.addClass( this[length], value );
         }
         return this;
     },
     removeClass: function ( value ) {
         var length = this.length;
         while ( length-- ) {
-            Vue.util.removeClass( this[ length ], value );
+            Vue.util.removeClass( this[length], value );
         }
         return this;
     },
@@ -107,27 +106,27 @@ Vue.util.extend( proto, {
     remove: function () {
         var length = this.length;
         while ( length-- ) {
-            Vue.util.remove( this[ length ] );
+            Vue.util.remove( this[length] );
         }
         return this;
     },
 
     // Vue不同版本处理不一样，早些版本是attr自动加Vue.config中的前缀，
     // 1.0版本后才去掉了前缀，所以干脆这里重新实现了。
-    attr: function ( name, value ) {
+    attr      : function ( name, value ) {
         if ( value == undefined ) {
-            return this[ 0 ].getAttribute( name );
+            return this[0].getAttribute( name );
         }
         var length = this.length;
         while ( length-- ) {
-            this[ length ].setAttribute( name, value );
+            this[length].setAttribute( name, value );
         }
         return this;
     },
     removeAttr: function ( name ) {
         var length = this.length;
         while ( length-- ) {
-            this[ length ].removeAttribute( name );
+            this[length].removeAttribute( name );
         }
         return this;
     },
@@ -137,11 +136,11 @@ Vue.util.extend( proto, {
     //      实验结果是，innerHTML对行数有限制，大于某阙值将溢出。
     html: function ( value ) {
         if ( value == undefined ) {
-            return this[ 0 ].innerHTML;
+            return this[0].innerHTML;
         }
         var length = this.length;
         while ( length-- ) {
-            this[ length ].innerHTML = value;
+            this[length].innerHTML = value;
         }
         return this;
     },
@@ -166,8 +165,8 @@ Vue.util.extend( proto, {
 
         if ( Vue.util.isPlainObject( name ) ) {
 
-            var cssText = [ '' ];
-            Vue.util.each( name, function ( item, key ) {
+            var cssText = [''];
+            each( name, function ( item, key ) {
                 cssText.push(
                     key + ':' + parseUnit( item )
                 )
@@ -176,17 +175,17 @@ Vue.util.extend( proto, {
             cssText = cssText.join( ';' );
 
             while ( length-- ) {
-                this[ length ].style.cssText += cssText;
+                this[length].style.cssText += cssText;
             }
 
         } else {
             name = Vue.util.camelize( name );
 
             if ( value == undefined ) {
-                return window.getComputedStyle( this[ 0 ], null )[ name ];
+                return window.getComputedStyle( this[0], null )[name];
             } else {
                 while ( length-- ) {
-                    this[ length ].style[ name ] = parseUnit( value );
+                    this[length].style[name] = parseUnit( value );
                 }
             }
         }
@@ -196,34 +195,34 @@ Vue.util.extend( proto, {
 
     // on & off，event这块单独拎出来都是大学问，纠结了很久，决定还是放弃jquery中维护event 存储对象的方式
     // 依然简陋的实现，稍微有点成绩的，就是批量绑定吧
-    on: function ( type, fn ) {
+    on : function ( type, fn ) {
         var length = this.length;
         while ( length-- ) {
-            Vue.util.on( this[ length ], type, fn );
+            Vue.util.on( this[length], type, fn );
         }
         return this;
     },
     off: function ( type, fn ) {
         var length = this.length;
         while ( length-- ) {
-            Vue.util.off( this[ length ], type, fn );
+            Vue.util.off( this[length], type, fn );
         }
         return this;
     }
 } );
 
-// width & height;
+// width & height
 // 没有特别对document、window等等做处理，一般情况下用不到
 // 继续保持轻量
-Vue.util.each( [ 'width', 'height' ], function ( key ) {
+each( ['width', 'height'], function ( key ) {
 
-    proto[ key ] = function ( value ) {
+    proto[key] = function ( value ) {
 
         if ( value ) {
             return this.css( key, typeof value === 'string' ? value : value + 'px' );
         }
 
-        return this[ 0 ].getBoundingClientRect()[ key ];
+        return this[0].getBoundingClientRect()[key];
     }
 
 } );
@@ -233,6 +232,3 @@ Vue.util.each( [ 'width', 'height' ], function ( key ) {
 // 原形变换
 vQuery.fn = vQuery.prototype = proto;
 vQuery.fn.init.prototype = vQuery.fn;
-
-// install
-install( Vue );

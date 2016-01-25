@@ -12,10 +12,26 @@
 <div id="testDiv">
     test div
 </div>
-<script src="//cdn.bootcss.com/vue/1.0.0-beta.2/vue.js"></script>
+<script src="http://cdn.bootcss.com/vue/1.0.15/vue.js"></script>
 <script src="dist/vue-plugin.js"></script>
 <script>
+    Vue.ready( function ( Vue ) {
+        console.log( Vue, 'Dom ready' );
 
+        var params = {
+            a: 1,
+            b: 2,
+            c: {
+                c1: 3,
+                c2: 4
+            }
+        };
+
+        console.log(
+                Vue.plugin.param( params ),
+                'Vue.plugin.param'
+        )
+    } );
 </script>
 </body>
 </html>

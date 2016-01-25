@@ -9,6 +9,12 @@
 
 /* global Vue */
 
+Vue.use( {
+    install: function ( Vue ) {
+        Vue.ready = ready;
+    }
+} );
+
 var doc       = document;
 var isReady   = false;
 var readyRE   = /complete|loaded|interactive/;
@@ -16,7 +22,7 @@ var eventType = 'DOMContentLoaded';
 
 var callBacks = [];
 
-if ( readyRE.test( doc[ 'readyState' ] ) ) {
+if ( readyRE.test( doc['readyState'] ) ) {
     setTimeout( fireEvent, 1 );
 } else {
     doc.addEventListener( eventType, fireEvent, false );
@@ -42,18 +48,11 @@ function fireEvent() {
  *
  * @param fn
  */
-Vue.ready = function ( fn ) {
-
+function ready( fn ) {
     if ( isReady ) {
         fn( Vue );
     } else {
         callBacks.push( fn );
     }
 
-};
-
-// 将Vue-plugin的API签名打包到vueExpose中，方便作者查看
-Vue.vueExpose = Vue.vueExpose || [];
-Vue.vueExpose.push( 'ready' );
-
-console.log( '[ Vuejs < domReady module > installation success! ]' );
+}

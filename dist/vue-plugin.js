@@ -61,9 +61,6 @@
 	__webpack_require__( 3 );
 	__webpack_require__( 4 );
 
-	// �ֶ�����
-	Vue.vueExpose = Vue.vueExpose.sort();
-
 /***/ },
 /* 1 */
 /***/ function(module, exports) {
@@ -75,28 +72,23 @@
 	 * @date         2015.08.18
 	 * @version      1.0.5
 	 * @note         ajax 模块单拎出来
+	 *               因为Vue版本升级后，启用Object.freeze冻结util中的属性
+	 *               （这哥们真有代码洁癖，不知道什么样的人能给丫提PR）,
+	 *               所以将插件放在信
 	 */
 
 	/* global Vue */
 
 	// ==================== Bound to global Vue ==================== //
-
-	function install( Vue ) {
-
-	    Vue.util.each = each;
-	    Vue.util.type = type;
-	    Vue.util.NOOP = noop;
-
-	    // 将Vue-plugin的API签名打包到vueExpose中，方便作者查看
-	    Vue.vueExpose = Vue.vueExpose || [];
-	    Vue.vueExpose.push.apply( Vue.vueExpose, [
-	        'util.noop',
-	        'util.each',
-	        'util.type'
-	    ] );
-
-	    console.log( '[ Vuejs < plugins module > installation success! ]' );
-	}
+	Vue.use( {
+	    install: function ( Vue ) {
+	        Vue.plugin      = Vue.plugin || {};
+	        Vue.plugin.each = each;
+	        Vue.plugin.type = type;
+	        Vue.plugin.NOOP = noop;
+	        return Vue;
+	    }
+	} );
 
 	/**
 	 * ref: http://devdocs.io/javascript/global_objects/array/foreach
@@ -118,7 +110,7 @@
 	    }
 
 	    for ( var key in elements ) {
-	        if ( elements.hasOwnProperty( key ) && callBack( elements[ key ], key, elements ) === false ) {
+	        if ( elements.hasOwnProperty( key ) && callBack( elements[key], key, elements ) === false ) {
 	            break;
 	        }
 	    }
@@ -140,9 +132,6 @@
 	    return Object.prototype.toString.call( object ).replace( /\[\object|\]|\s/gi, '' ).toLowerCase();
 	}
 
-	// install it.
-	install( Vue );
-
 /***/ },
 /* 2 */
 /***/ function(module, exports) {
@@ -152,43 +141,29 @@
 	 * @fileoverview Vue ajax
 	 * @authors      litson.zhang@gmail.com
 	 * @date         2015.08.18
-	 * @version      1.0.7.1
+	 * @version      1.0.7.2
 	 * @note
+	 *      看 plugin.js 的 log~
 	 */
 
 	/* global Vue */
 
-
 	// ==================== Bound to global Vue ==================== //
-
-	function install( Vue ) {
-
-	    Vue.util.param = param;
-	    Vue.ajax       = ajax;
-	    Vue.get        = ajaxGet;
-	    Vue.post       = ajaxPost;
-	    Vue.loadFile   = loadFile;
-	    Vue.getJSON    = ajaxGetJSON;
-
-	    // 将Vue-plugin的API签名打包到vueExpose中，方便作者查看
-	    Vue.vueExpose = Vue.vueExpose || [];
-	    Vue.vueExpose.push.apply( Vue.vueExpose, [
-	        'ajaxSetting',
-	        'util.param',
-	        'ajax',
-	        'post',
-	        'get',
-	        'loadFile',
-	        'getJSON'
-	    ] );
-
-	    console.log( '[ Vuejs < ajax module > installation success! ]' );
-	}
+	Vue.use( {
+	    install: function ( Vue ) {
+	        Vue.plugin.param = param;
+	        Vue.ajax         = ajax;
+	        Vue.get          = ajaxGet;
+	        Vue.post         = ajaxPost;
+	        Vue.loadFile     = loadFile;
+	        Vue.getJSON      = ajaxGetJSON;
+	    }
+	} );
 
 	var extend  = Vue.util.extend;
-	var noop    = Vue.util.NOOP;
-	var type    = Vue.util.type;
-	var forEach = Vue.util.each;
+	var noop    = Vue.plugin.NOOP;
+	var type    = Vue.plugin.type;
+	var forEach = Vue.plugin.each;
 
 	/**
 	 *
@@ -240,8 +215,8 @@
 	 *      // output: items[testBbject]=1&test2[]=1&test2[]=3&test2[]=4
 	 *
 	 *
-	 * Use Vue.util.param
-	 *      decodeURIComponent( Vue.util.param( params ) );
+	 * Use Vue.plugin.param
+	 *      decodeURIComponent( Vue.plugin.param( params ) );
 	 *      // output: items[testBbject]=1&test2[]=1&test2[]=3&test2[]=4
 	 *
 	 *
@@ -886,7 +861,7 @@
 	 */
 	function serializeData( options ) {
 	    if ( options.data && type( options.data ) !== 'string' ) {
-	        options.data = Vue.util.param( options.data );
+	        options.data = Vue.plugin.param( options.data );
 	    }
 
 	    if ( options.data && options.type.toLocaleLowerCase() === 'get' ) {
@@ -906,9 +881,6 @@
 	    return (query === '') ? url : (url + '&' + query).replace( /[&?]{1,2}/, '?' );
 	}
 
-	// install it.
-	install( Vue );
-
 /***/ },
 /* 3 */
 /***/ function(module, exports) {
@@ -924,6 +896,12 @@
 
 	/* global Vue */
 
+	Vue.use( {
+	    install: function ( Vue ) {
+	        Vue.ready = ready;
+	    }
+	} );
+
 	var doc       = document;
 	var isReady   = false;
 	var readyRE   = /complete|loaded|interactive/;
@@ -931,7 +909,7 @@
 
 	var callBacks = [];
 
-	if ( readyRE.test( doc[ 'readyState' ] ) ) {
+	if ( readyRE.test( doc['readyState'] ) ) {
 	    setTimeout( fireEvent, 1 );
 	} else {
 	    doc.addEventListener( eventType, fireEvent, false );
@@ -957,21 +935,14 @@
 	 *
 	 * @param fn
 	 */
-	Vue.ready = function ( fn ) {
-
+	function ready( fn ) {
 	    if ( isReady ) {
 	        fn( Vue );
 	    } else {
 	        callBacks.push( fn );
 	    }
 
-	};
-
-	// 将Vue-plugin的API签名打包到vueExpose中，方便作者查看
-	Vue.vueExpose = Vue.vueExpose || [];
-	Vue.vueExpose.push( 'ready' );
-
-	console.log( '[ Vuejs < domReady module > installation success! ]' );
+	}
 
 /***/ },
 /* 4 */
@@ -998,17 +969,16 @@
 
 	// ==================== Bound to global Vue ==================== //
 
-	function install( Vue ) {
-	    Vue.$ = vQuery;
-	    // 将Vue-plugin的API签名打包到vueExpose中，方便作者查看
-	    Vue.vueExpose = Vue.vueExpose || [];
-	    Vue.vueExpose.push( '$' );
+	Vue.use( {
+	    install: function ( Vue ) {
+	        Vue.$ = vQuery;
+	    }
+	} );
 
-	    console.log( '[ Vuejs < Vue $ module > installation success! ]' );
-	}
 	// ==================== vQuery ==================== //
 
-	var doc = document;
+	var doc  = document;
+	var each = Vue.plugin.each;
 
 	var makeArray = function ( arrayLike ) {
 	    return Array.prototype.slice.call( arrayLike, 0 );
@@ -1027,9 +997,9 @@
 	 */
 	var proto = {
 	    constructor: vQuery,
-	    init: function ( selecter ) {
+	    init       : function ( selecter ) {
 	        var self = this;
-	        var dom = [];
+	        var dom  = [];
 
 	        if ( !selecter ) {
 	            return dom;
@@ -1040,7 +1010,7 @@
 	            selecter.nodeType
 	            || (typeof selecter === 'object' && 'setInterval' in selecter)
 	        ) {
-	            dom = [ selecter ];
+	            dom = [selecter];
 	        }
 
 	        // selector
@@ -1048,37 +1018,37 @@
 	            dom = makeArray( doc.querySelectorAll( selecter ), 0 );
 	        }
 
-	        Vue.util.each(
+	        each(
 	            dom,
 	            function ( item, index ) {
-	                self[ index ] = item;
+	                self[index] = item;
 	            }
 	        );
 
-	        self.length = dom.length;
+	        self.length   = dom.length;
 	        dom.__proto__ = vQuery.fn;
 	        return dom;
 
 	    },
-	    length: 0
+	    length     : 0
 	};
 
-	Vue.util.extend( proto, {
+	Vue.plugin.extend( proto, {
 	    size: function () {
 	        return this.length;
 	    },
 
-	    addClass: function ( value ) {
+	    addClass   : function ( value ) {
 	        var length = this.length;
 	        while ( length-- ) {
-	            Vue.util.addClass( this[ length ], value );
+	            Vue.util.addClass( this[length], value );
 	        }
 	        return this;
 	    },
 	    removeClass: function ( value ) {
 	        var length = this.length;
 	        while ( length-- ) {
-	            Vue.util.removeClass( this[ length ], value );
+	            Vue.util.removeClass( this[length], value );
 	        }
 	        return this;
 	    },
@@ -1086,27 +1056,27 @@
 	    remove: function () {
 	        var length = this.length;
 	        while ( length-- ) {
-	            Vue.util.remove( this[ length ] );
+	            Vue.util.remove( this[length] );
 	        }
 	        return this;
 	    },
 
 	    // Vue不同版本处理不一样，早些版本是attr自动加Vue.config中的前缀，
 	    // 1.0版本后才去掉了前缀，所以干脆这里重新实现了。
-	    attr: function ( name, value ) {
+	    attr      : function ( name, value ) {
 	        if ( value == undefined ) {
-	            return this[ 0 ].getAttribute( name );
+	            return this[0].getAttribute( name );
 	        }
 	        var length = this.length;
 	        while ( length-- ) {
-	            this[ length ].setAttribute( name, value );
+	            this[length].setAttribute( name, value );
 	        }
 	        return this;
 	    },
 	    removeAttr: function ( name ) {
 	        var length = this.length;
 	        while ( length-- ) {
-	            this[ length ].removeAttribute( name );
+	            this[length].removeAttribute( name );
 	        }
 	        return this;
 	    },
@@ -1116,11 +1086,11 @@
 	    //      实验结果是，innerHTML对行数有限制，大于某阙值将溢出。
 	    html: function ( value ) {
 	        if ( value == undefined ) {
-	            return this[ 0 ].innerHTML;
+	            return this[0].innerHTML;
 	        }
 	        var length = this.length;
 	        while ( length-- ) {
-	            this[ length ].innerHTML = value;
+	            this[length].innerHTML = value;
 	        }
 	        return this;
 	    },
@@ -1145,8 +1115,8 @@
 
 	        if ( Vue.util.isPlainObject( name ) ) {
 
-	            var cssText = [ '' ];
-	            Vue.util.each( name, function ( item, key ) {
+	            var cssText = [''];
+	            each( name, function ( item, key ) {
 	                cssText.push(
 	                    key + ':' + parseUnit( item )
 	                )
@@ -1155,17 +1125,17 @@
 	            cssText = cssText.join( ';' );
 
 	            while ( length-- ) {
-	                this[ length ].style.cssText += cssText;
+	                this[length].style.cssText += cssText;
 	            }
 
 	        } else {
 	            name = Vue.util.camelize( name );
 
 	            if ( value == undefined ) {
-	                return window.getComputedStyle( this[ 0 ], null )[ name ];
+	                return window.getComputedStyle( this[0], null )[name];
 	            } else {
 	                while ( length-- ) {
-	                    this[ length ].style[ name ] = parseUnit( value );
+	                    this[length].style[name] = parseUnit( value );
 	                }
 	            }
 	        }
@@ -1175,34 +1145,34 @@
 
 	    // on & off，event这块单独拎出来都是大学问，纠结了很久，决定还是放弃jquery中维护event 存储对象的方式
 	    // 依然简陋的实现，稍微有点成绩的，就是批量绑定吧
-	    on: function ( type, fn ) {
+	    on : function ( type, fn ) {
 	        var length = this.length;
 	        while ( length-- ) {
-	            Vue.util.on( this[ length ], type, fn );
+	            Vue.util.on( this[length], type, fn );
 	        }
 	        return this;
 	    },
 	    off: function ( type, fn ) {
 	        var length = this.length;
 	        while ( length-- ) {
-	            Vue.util.off( this[ length ], type, fn );
+	            Vue.util.off( this[length], type, fn );
 	        }
 	        return this;
 	    }
 	} );
 
-	// width & height;
+	// width & height
 	// 没有特别对document、window等等做处理，一般情况下用不到
 	// 继续保持轻量
-	Vue.util.each( [ 'width', 'height' ], function ( key ) {
+	each( ['width', 'height'], function ( key ) {
 
-	    proto[ key ] = function ( value ) {
+	    proto[key] = function ( value ) {
 
 	        if ( value ) {
 	            return this.css( key, typeof value === 'string' ? value : value + 'px' );
 	        }
 
-	        return this[ 0 ].getBoundingClientRect()[ key ];
+	        return this[0].getBoundingClientRect()[key];
 	    }
 
 	} );
@@ -1212,9 +1182,6 @@
 	// 原形变换
 	vQuery.fn = vQuery.prototype = proto;
 	vQuery.fn.init.prototype = vQuery.fn;
-
-	// install
-	install( Vue );
 
 /***/ }
 /******/ ]);
