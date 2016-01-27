@@ -6,8 +6,6 @@
             Vuep 曝露方法从 Vue.util中迁移到 Vue.plugin 中
 
 
-
-
 ### API
 - Vue.$
 - Vue.ajax
@@ -17,10 +15,10 @@
 - Vue.post
 - Vue.loadFile
 - Vue.ready
-- Vue.util.each
-- Vue.util.noop
-- Vue.util.param
-- Vue.util.type 
+- Vue.plugin.each
+- Vue.plugin.noop
+- Vue.plugin.param
+- Vue.plugin.type 
 
 
 #### Vue.ajax
