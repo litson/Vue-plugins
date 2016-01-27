@@ -1,7 +1,3 @@
-/* global module */
-
-'use strict';
-
 /**
  * ref: http://devdocs.io/javascript/global_objects/array/foreach
  *

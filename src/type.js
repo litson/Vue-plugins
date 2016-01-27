@@ -1,6 +1,3 @@
-/* global module */
-
-'use strict';
 /**
  * Get data type
  * @param object

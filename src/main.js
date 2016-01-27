@@ -18,13 +18,19 @@ Vue.use( {
     install: function ( Vue ) {
         Vue.plugin = Vue.plugin || {};
 
-        Vue.plugin.each = require( './each' );
-        Vue.plugin.type = require( './type' );
-        Vue.plugin.NOOP = require( './noop' );
+        Vue.plugin.each  = require( './each' );
+        Vue.plugin.type  = require( './type' );
+        Vue.plugin.NOOP  = require( './noop' );
+        Vue.plugin.param = require( './param' );
 
         Vue.ready = require( './domReady' );
-        Vue.$     = require( './Vue.$.js' );
+
+        Vue.util.extend(
+            Vue,
+            require( './ajax' )
+        );
+
+        Vue.$ = require( './Vue.$' );
+
     }
 } );
-
-require( './ajax.js' );

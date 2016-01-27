@@ -9,152 +9,29 @@
  */
 
 /* global Vue */
-
-// ==================== Bound to global Vue ==================== //
-Vue.use( {
-    install: function ( Vue ) {
-        Vue.plugin.param = param;
-        Vue.ajax         = ajax;
-        Vue.get          = ajaxGet;
-        Vue.post         = ajaxPost;
-        Vue.loadFile     = loadFile;
-        Vue.getJSON      = ajaxGetJSON;
-    }
-} );
-
 var extend  = Vue.util.extend;
-var noop    = Vue.plugin.NOOP;
-var type    = Vue.plugin.type;
-var forEach = Vue.plugin.each;
+var noop    = require( './noop' );
+var type    = require( './type' );
+var forEach = require( './each' );
 
-/**
- *
- * 序列化参数
- *
- * @param elements
- * @param traditional
- * @returns {string}
- */
-function param( elements, traditional ) {
+var appendQuery = require( './appendQuery' );
+var param       = require( './param' );
 
-    var result = [];
-    result.add = function ( item, key ) {
+var _mergeExceptUndefined = require( './mergeExcludeUndefined' );
 
-        // If value is a function, invoke it and return its value
-        if ( 'function' === type( item ) ) {
-            item = item();
-        }
-
-        if ( null == item ) {
-            item = '';
-        }
-
-        result[result.length] = encodeURIComponent( key ) + '=' + encodeURIComponent( item );
-
-    };
-
-    // http://www.w3school.com.cn/jquery/ajax_param.asp
-    _buildParam( result, elements, traditional );
-
-    return result.join( '&' ).replace( /%20/g, '+' );
-}
-
-/**
- *
- * 处理多纬数组
- *
- * E.g
- *
- * var params = {
-     *
-     *      items: {  testBbject: 1 },
-     *      test2: [1, 2, 3]
-     *
-     * }
- *
- * Use jQuery or Zepto:
- *      decodeURIComponent( $.param( params ) );
- *      // output: items[testBbject]=1&test2[]=1&test2[]=3&test2[]=4
- *
- *
- * Use Vue.plugin.param
- *      decodeURIComponent( Vue.plugin.param( params ) );
- *      // output: items[testBbject]=1&test2[]=1&test2[]=3&test2[]=4
- *
- *
- *
- *
- * @param params
- * @param elements
- * @param traditional
- * @param prefix
- * @private
- */
-function _buildParam( params, elements, traditional, prefix ) {
-
-    var isPlainObject = 'object' === type( elements );
-
-    forEach( elements, function ( item, key ) {
-
-        var _type          = type( item );
-        var _isPlainObject = 'object' === _type;
-        var _isArray       = 'array' === _type;
-
-        if ( prefix ) {
-
-            if ( traditional ) {
-                key = prefix;
-            } else {
-                key =
-                    [
-                        prefix
-                        , '['
-                        , (isPlainObject || _isPlainObject || _isArray) ? key : ''
-                        , ']'
-                    ].join( '' );
-            }
-        }
-
-        /**
-         * 因为这里不需要对form DOM 做扫描
-         * 所以和 $.param 不同的是，去掉了 serializeArray 的format
-         */
-        if ( _isArray || (!traditional && _isPlainObject) ) {
-            _buildParam( params, item, traditional, key );
-        } else {
-            params.add( item, key );
-        }
-
-    } );
-
-}
-
-// Vue Ajax Default Options.
-Vue.ajaxSettings = {
-    type       : 'GET',
-    url        : location.href,
-    data       : '',
-    dataType   : 'json',
-    cache      : true,
-    async      : true,
-    username   : null,
-    password   : null,
-    contentType: null,
-    xhrFields  : null,
-    context    : null,
-    timeout    : 0,
-    xhr        : function () {
-        return new window.XMLHttpRequest()
-    },
-    // 9月15日更新，加入dataFilter
-    dataFilter : null,
-    beforeSend : noop,
-    complete   : noop,
-    success    : noop,
-    error      : noop
-};
+var ajaxSettings = require( './ajaxSettings' );
 
 var blankRE = /^\s*$/;
+
+// Output
+module.exports = {
+    ajaxSettings: ajaxSettings,
+    ajax        : ajax,
+    get         : ajaxGet,
+    post        : ajaxPost,
+    loadFile    : loadFile,
+    getJSON     : ajaxGetJSON
+};
 
 /**
  *
@@ -176,15 +53,14 @@ function ajax( options ) {
     var hasPlaceholder;
     var protocol = /^([\w-]+:)\/\//.test( options.url ) ? RegExp.$1 : window.location.protocol;
 
-    _mergeExceptUndefined( Vue.ajaxSettings, options );
+    _mergeExceptUndefined( ajaxSettings, options );
 
     if ( !options.crossDomain ) {
         options.crossDomain =
             /^([\w-]+:)?\/\/([^\/]+)/.test( options.url )
             && RegExp.$2 != window.location.host;
     }
-
-
+    
     // 过滤掉hash
     hashIndex = options.url.indexOf( '#' );
 
@@ -215,7 +91,7 @@ function ajax( options ) {
     // 不走 xhr + eval 的加载脚本方式，改为外联。保证没有跨域问题,而且性能上成
     if ( 'script' === dataType ) {
         // options.timeout && console.log('Sorry, dataType == script 暂不支持timeout');
-        return Vue.loadFile( {
+        return loadFile( {
             url    : options.url,
             success: function () {
                 _ajaxHelpers.success( null, null, options );
@@ -350,25 +226,6 @@ var _ajaxHelpers = {
 };
 
 /**
- * 去掉undefined的属性
- * merge
- *
- * @param from
- * @param to
- * @returns {*}
- * @private
- */
-function _mergeExceptUndefined( from, to ) {
-    forEach( from, function ( item, key ) {
-        if ( to[key] === undefined ) {
-            to[key] = item;
-        }
-    } );
-
-    return to;
-}
-
-/**
  *
  *
  * Ajax, method 'get'.
@@ -381,7 +238,7 @@ function _mergeExceptUndefined( from, to ) {
  * @param dataType
  */
 function ajaxGet( /* url, data, success, dataType */ ) {
-    return Vue.ajax( _paramParser.apply( null, arguments ) );
+    return ajax( _paramParser.apply( null, arguments ) );
 }
 
 /**
@@ -398,7 +255,7 @@ function ajaxGet( /* url, data, success, dataType */ ) {
 function ajaxPost( /* url, data, success, dataType */ ) {
     var options  = _paramParser.apply( null, arguments );
     options.type = 'post';
-    return Vue.ajax( options );
+    return ajax( options );
 }
 
 /**
@@ -415,7 +272,7 @@ function ajaxPost( /* url, data, success, dataType */ ) {
 function ajaxGetJSON( /* url, data, success, dataType */ ) {
     var options      = _paramParser.apply( null, arguments );
     options.dataType = 'json';
-    return Vue.ajax( options );
+    return ajax( options );
 }
 
 /**
@@ -452,7 +309,7 @@ function jsonPadding( options ) {
         }, options.timeout );
     }
 
-    return Vue.loadFile( {
+    return loadFile( {
         url    : options.url.replace( /\?(.+)=\?/, '?$1=' + callbackName ),
         success: callBack,
         error  : callBack
@@ -723,22 +580,11 @@ function _loadFile( url, success, error, props ) {
  */
 function serializeData( options ) {
     if ( options.data && type( options.data ) !== 'string' ) {
-        options.data = Vue.plugin.param( options.data );
+        options.data = param( options.data );
     }
 
     if ( options.data && options.type.toLocaleLowerCase() === 'get' ) {
         options.url  = appendQuery( options.url, options.data );
         options.data = undefined;
     }
-}
-
-/**
- * url后附加query string
- *
- * @param url
- * @param query
- * @returns {string}
- */
-function appendQuery( url, query ) {
-    return (query === '') ? url : (url + '&' + query).replace( /[&?]{1,2}/, '?' );
 }
