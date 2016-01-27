@@ -16,6 +16,7 @@
 
 Vue.use( {
     install: function ( Vue ) {
+
         Vue.plugin = Vue.plugin || {};
 
         Vue.plugin.each  = require( './each' );
@@ -31,6 +32,5 @@ Vue.use( {
         );
 
         Vue.$ = require( './Vue.$' );
-
     }
 } );
