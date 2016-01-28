@@ -1,29 +1,17 @@
-/**
- * @file
- * @fileoverview Vue ajax
- * @authors      litson.zhang@gmail.com
- * @date         2015.08.18
- * @version      1.0.7.2
- * @note
- *      看 plugin.js 的 log~
- */
-
 /* global Vue */
-var extend  = Vue.util.extend;
-var noop    = require( './noop' );
-var type    = require( './type' );
-var forEach = require( './each' );
 
-var appendQuery = require( './appendQuery' );
-var param       = require( './param' );
-var loadFile    = require( './loadFile' );
-
-var _mergeExceptUndefined = require( './mergeExcludeUndefined' );
-
-var ajaxSettings = require( './ajaxSettings' );
-var _ajaxHelpers = require( './ajaxHelpers' );
-
-var blankRE = /^\s*$/;
+var noop                  = require( './noop' );
+var type                  = require( './type' );
+var param                 = require( './param' );
+var extend                = Vue.util.extend;
+var blankRE               = /^\s*$/;
+var forEach               = require( './each' );
+var loadFile              = require( './loadFile' );
+var appendQuery           = require( './appendQuery' );
+var jsonPadding           = require( './ajaxJsonPadding' );
+var ajaxHelpers           = require( './ajaxHelpers' );
+var ajaxSettings          = require( './ajaxSettings' );
+var mergeExcludeUndefined = require( './mergeExcludeUndefined' );
 
 // Output
 module.exports = {
@@ -51,7 +39,7 @@ function ajax( options ) {
     var hasPlaceholder;
     var protocol = /^([\w-]+:)\/\//.test( options.url ) ? RegExp.$1 : window.location.protocol;
 
-    _mergeExceptUndefined( ajaxSettings, options );
+    mergeExcludeUndefined( ajaxSettings, options );
 
     if ( !options.crossDomain ) {
         options.crossDomain =
@@ -92,10 +80,10 @@ function ajax( options ) {
         return loadFile( {
             url    : options.url,
             success: function () {
-                _ajaxHelpers.success( null, null, options );
+                ajaxHelpers.success( null, null, options );
             },
             error  : function ( event ) {
-                _ajaxHelpers.error( event, 'error', null, options );
+                ajaxHelpers.error( event, 'error', null, options );
             },
             props  : {}
         } );
@@ -157,20 +145,20 @@ function ajax( options ) {
                 }
 
                 if ( error ) {
-                    _ajaxHelpers.error( error, 'parsererror', xhr, options );
+                    ajaxHelpers.error( error, 'parsererror', xhr, options );
                 } else {
-                    _ajaxHelpers.success( result, xhr, options );
+                    ajaxHelpers.success( result, xhr, options );
                 }
 
             } else {
-                _ajaxHelpers.error( xhr.statusText || null, xhr.status ? 'error' : 'abort', xhr, options );
+                ajaxHelpers.error( xhr.statusText || null, xhr.status ? 'error' : 'abort', xhr, options );
             }
         }
     };
 
-    if ( false === _ajaxHelpers.beforeSend( xhr, options ) ) {
+    if ( false === ajaxHelpers.beforeSend( xhr, options ) ) {
         xhr.abort();
-        _ajaxHelpers.error( null, 'abort', xhr, options );
+        ajaxHelpers.error( null, 'abort', xhr, options );
         return xhr;
     }
 
@@ -195,7 +183,7 @@ function ajax( options ) {
         abortTimer = setTimeout( function () {
             xhr.onreadystatechange = noop;
             xhr.abort();
-            _ajaxHelpers.error( null, 'timeout', xhr, options );
+            ajaxHelpers.error( null, 'timeout', xhr, options );
         }, options.timeout );
     }
 
@@ -203,49 +191,6 @@ function ajax( options ) {
 
     return xhr;
 }
-
-
-/**
- * jsonp函数
- * @param options
- * @returns {*}
- */
-function jsonPadding( options ) {
-
-    // 黑魔法~
-    var callbackName = options.jsonpCallback || 'jsonp' + setTimeout( '1' );
-    var responseData;
-    var abortTimeout;
-
-    // 失败或成功后的回调
-    function callBack( event ) {
-        clearTimeout( abortTimeout );
-
-        if ( event.type === 'error' || !responseData ) {
-            _ajaxHelpers.error( null, 'error', {abort: noop}, options );
-        } else {
-            _ajaxHelpers.success( responseData[0], {abort: noop}, options );
-        }
-    }
-
-    // 文件下载完成后，将返回值缓存起来
-    window[callbackName] = function () {
-        responseData = arguments;
-    };
-
-    if ( options.timeout > 0 ) {
-        abortTimeout = setTimeout( function () {
-            _ajaxHelpers.error( null, 'timeout', {abort: noop}, options );
-        }, options.timeout );
-    }
-
-    return loadFile( {
-        url    : options.url.replace( /\?(.+)=\?/, '?$1=' + callbackName ),
-        success: callBack,
-        error  : callBack
-    } );
-}
-
 
 /**
  * Serialize data to string.

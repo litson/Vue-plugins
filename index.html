@@ -16,12 +16,21 @@
 <div class="container">
 
     <p>
-        <a href="#nogo" class="btn btn-danger" data-action="loadJs">测试loadFile API，加载js文件功能</a>
+        <a href="#nogo" class="btn btn-danger" data-action="loadJs">loadFile js</a>
     </p>
 
     <p>
-        <a href="#nogo" class="btn btn-danger" data-action="loadCss">测试loadFile API，加载css文件功能</a>
+        <a href="#nogo" class="btn btn-danger" data-action="loadCss">loadFile css</a>
     </p>
+
+    <p>
+        <a href="#nogo" class="btn btn-danger" data-action="ajax">ajax</a>
+    </p>
+
+    <p>
+        <a href="#nogo" class="btn btn-danger" data-action="ajax">ajax</a>
+    </p>
+
 
 </div>
 
@@ -44,11 +53,29 @@
                 Vue.loadFile(
                         baseUrl + 'cssFile.css'
                 );
+            },
+            ajax   : function () {
+                Vue.ajax( {
+                    url    : baseUrl + 'api.json',
+                    success: function ( ajaxData ) {
+
+                        alert(
+                                JSON.stringify(
+                                        ajaxData,
+                                        null,
+                                        4
+                                )
+                        )
+
+                    },
+                    error  : function () {
+                        console.log( arguments )
+                    }
+                } );
             }
         };
 
         Vue.$( '[data-action]' ).on( 'click', function () {
-
             var key = this.dataset.action;
             actionMapping[key] && actionMapping[key]();
         } );
