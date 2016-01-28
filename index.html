@@ -4,35 +4,56 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
     <title></title>
+    <link rel="stylesheet" href="//cdn.bootcss.com/bootstrap/4.0.0-alpha.2/css/bootstrap.css">
+    <style>
+        .container {
+            padding: 2rem 1rem;
+        }
+    </style>
 </head>
 <body>
-<div>
-    test
+
+<div class="container">
+
+    <p>
+        <a href="#nogo" class="btn btn-danger" data-action="loadJs">测试loadFile API，加载js文件功能</a>
+    </p>
+
+    <p>
+        <a href="#nogo" class="btn btn-danger" data-action="loadCss">测试loadFile API，加载css文件功能</a>
+    </p>
+
 </div>
-<div id="testDiv">
-    test div
-</div>
+
 <script src="http://cdn.bootcss.com/vue/1.0.15/vue.js"></script>
 <script src="dist/vue-plugin.js"></script>
 <script>
     Vue.ready( function ( Vue ) {
-        console.log( Vue, 'Dom ready' );
 
-        var params = {
-            a: 1,
-            b: 2,
-            c: {
-                c1: 3,
-                c2: 4
+        var baseUrl = '/GITHUB/Vue-plugins/test/';
+
+        var actionMapping = {
+            loadJs : function () {
+
+                Vue.loadFile(
+                        baseUrl + 'jsFile.js'
+                );
+
+            },
+            loadCss: function () {
+                Vue.loadFile(
+                        baseUrl + 'cssFile.css'
+                );
             }
         };
 
+        Vue.$( '[data-action]' ).on( 'click', function () {
+
+            var key = this.dataset.action;
+            actionMapping[key] && actionMapping[key]();
+        } );
 
 
-        console.log(
-                Vue.plugin.param( params ),
-                'Vue.plugin.param'
-        )
     } );
 </script>
 </body>

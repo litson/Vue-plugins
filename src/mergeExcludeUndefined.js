@@ -1,5 +1,7 @@
+var forEach = require( './each' );
+
 /**
- * È¥µôundefinedµÄÊôĞÔ
+ * å»æ‰undefinedçš„å±æ€§
  * merge
  *
  * @param from

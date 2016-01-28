@@ -1,12 +1,3 @@
-/**
- * @file
- * @fileoverview DOM ready for Vue
- * @authors      litson.zhang@gmail.com
- * @date         2015.08.18
- * @version      1.0
- * @note
- */
-
 /* global Vue */
 var doc       = document;
 var isReady   = false;

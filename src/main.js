@@ -17,6 +17,14 @@
 Vue.use( {
     install: function ( Vue ) {
 
+        /**
+         * 如下配置可以跟进配置酌情注释，不会影响主功能；
+         *
+         * 一些变种函数如果注释掉打包后，可以更好的减少体积
+         *
+         * @type {{}}
+         */
+
         Vue.plugin = Vue.plugin || {};
 
         Vue.plugin.each  = require( './each' );
@@ -26,10 +34,15 @@ Vue.use( {
 
         Vue.ready = require( './domReady' );
 
-        Vue.util.extend(
-            Vue,
-            require( './ajax' )
-        );
+        Vue.ajaxSettings = require( './ajax' ).ajaxSettings;
+        Vue.ajax         = require( './ajax' ).ajax;
+
+        // 变种函数
+        Vue.get      = require( './ajaxGet' );
+        Vue.post     = require( './ajaxPost' );
+        Vue.getJSON  = require( './ajaxGetJSON' );
+        Vue.loadFile = require( './loadFile' );
+
 
         Vue.$ = require( './Vue.$' );
     }

@@ -16,7 +16,7 @@ module.exports = {
     xhr        : function () {
         return new window.XMLHttpRequest()
     },
-    // 9ÔÂ15ÈÕ¸üĞÂ£¬¼ÓÈëdataFilter
+    // 9æœˆ15æ—¥æ›´æ–°ï¼ŒåŠ å…¥dataFilter
     dataFilter : null,
     beforeSend : noop,
     complete   : noop,

@@ -3,7 +3,7 @@ var forEach = require( './each' );
 
 /**
  *
- * ĞòÁĞ»¯²ÎÊı
+ * åºåˆ—åŒ–å‚æ•°
  *
  * @param elements
  * @param traditional
@@ -35,7 +35,7 @@ module.exports = function ( elements, traditional ) {
 
 /**
  *
- * ´¦Àí¶àÎ³Êı×é
+ * å¤„ç†å¤šçº¬æ•°ç»„
  *
  * E.g
  *
@@ -90,8 +90,8 @@ function _buildParam( params, elements, traditional, prefix ) {
         }
 
         /**
-         * ÒòÎªÕâÀï²»ĞèÒª¶Ôform DOM ×öÉ¨Ãè
-         * ËùÒÔºÍ $.param ²»Í¬µÄÊÇ£¬È¥µôÁË serializeArray µÄformat
+         * å› ä¸ºè¿™é‡Œä¸éœ€è¦å¯¹form DOM åšæ‰«æ
+         * æ‰€ä»¥å’Œ $.param ä¸åŒçš„æ˜¯ï¼Œå»æ‰äº† serializeArray çš„format
          */
         if ( _isArray || (!traditional && _isPlainObject) ) {
             _buildParam( params, item, traditional, key );

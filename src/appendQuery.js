@@ -1,5 +1,5 @@
 /**
- * url�󸽼�query string
+ * url后附加query string
  *
  * @param url
  * @param query
