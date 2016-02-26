@@ -1,4 +1,14 @@
-/******/ (function(modules) { // webpackBootstrap
+(function webpackUniversalModuleDefinition(root, factory) {
+	if(typeof exports === 'object' && typeof module === 'object')
+		module.exports = factory();
+	else if(typeof define === 'function' && define.amd)
+		define([], factory);
+	else {
+		var a = factory();
+		for(var i in a) (typeof exports === 'object' ? exports : root)[i] = a[i];
+	}
+})(this, function() {
+return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
 
@@ -84,13 +94,13 @@
 	        Vue.ajax         = __webpack_require__( 6 ).ajax;
 
 	        // 变种函数
-	        Vue.get      = __webpack_require__( 11 );
-	        Vue.post     = __webpack_require__( 13 );
-	        Vue.getJSON  = __webpack_require__( 14 );
-	        Vue.loadFile = __webpack_require__( 16 );
+	        Vue.get      = __webpack_require__( 13 );
+	        Vue.post     = __webpack_require__( 15 );
+	        Vue.getJSON  = __webpack_require__( 16 );
+	        Vue.loadFile = __webpack_require__( 7 );
 
 
-	        Vue.$ = __webpack_require__( 10 );
+	        Vue.$ = __webpack_require__( 17 );
 	    }
 	} );
 
@@ -306,32 +316,20 @@
 /* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/**
-	 * @file
-	 * @fileoverview Vue ajax
-	 * @authors      litson.zhang@gmail.com
-	 * @date         2015.08.18
-	 * @version      1.0.7.2
-	 * @note
-	 *      看 plugin.js 的 log~
-	 */
-
 	/* global Vue */
-	var extend  = Vue.util.extend;
-	var noop    = __webpack_require__( 3 );
-	var type    = __webpack_require__( 2 );
-	var forEach = __webpack_require__( 1 );
 
-	var appendQuery = __webpack_require__( 7 );
-	var param       = __webpack_require__( 4 );
-	var loadFile    = __webpack_require__( 16 );
-
-	var _mergeExceptUndefined = __webpack_require__( 8 );
-
-	var ajaxSettings = __webpack_require__( 9 );
-	var _ajaxHelpers = __webpack_require__( 15 );
-
-	var blankRE = /^\s*$/;
+	var noop                  = __webpack_require__( 3 );
+	var type                  = __webpack_require__( 2 );
+	var param                 = __webpack_require__( 4 );
+	var extend                = Vue.util.extend;
+	var blankRE               = /^\s*$/;
+	var forEach               = __webpack_require__( 1 );
+	var loadFile              = __webpack_require__( 7 );
+	var appendQuery           = __webpack_require__( 9 );
+	var jsonPadding           = __webpack_require__( 10 );
+	var ajaxHelpers           = __webpack_require__( 11 );
+	var ajaxSettings          = __webpack_require__( 12 );
+	var mergeExcludeUndefined = __webpack_require__( 8 );
 
 	// Output
 	module.exports = {
@@ -359,7 +357,7 @@
 	    var hasPlaceholder;
 	    var protocol = /^([\w-]+:)\/\//.test( options.url ) ? RegExp.$1 : window.location.protocol;
 
-	    _mergeExceptUndefined( ajaxSettings, options );
+	    mergeExcludeUndefined( ajaxSettings, options );
 
 	    if ( !options.crossDomain ) {
 	        options.crossDomain =
@@ -400,10 +398,10 @@
 	        return loadFile( {
 	            url    : options.url,
 	            success: function () {
-	                _ajaxHelpers.success( null, null, options );
+	                ajaxHelpers.success( null, null, options );
 	            },
 	            error  : function ( event ) {
-	                _ajaxHelpers.error( event, 'error', null, options );
+	                ajaxHelpers.error( event, 'error', null, options );
 	            },
 	            props  : {}
 	        } );
@@ -465,20 +463,20 @@
 	                }
 
 	                if ( error ) {
-	                    _ajaxHelpers.error( error, 'parsererror', xhr, options );
+	                    ajaxHelpers.error( error, 'parsererror', xhr, options );
 	                } else {
-	                    _ajaxHelpers.success( result, xhr, options );
+	                    ajaxHelpers.success( result, xhr, options );
 	                }
 
 	            } else {
-	                _ajaxHelpers.error( xhr.statusText || null, xhr.status ? 'error' : 'abort', xhr, options );
+	                ajaxHelpers.error( xhr.statusText || null, xhr.status ? 'error' : 'abort', xhr, options );
 	            }
 	        }
 	    };
 
-	    if ( false === _ajaxHelpers.beforeSend( xhr, options ) ) {
+	    if ( false === ajaxHelpers.beforeSend( xhr, options ) ) {
 	        xhr.abort();
-	        _ajaxHelpers.error( null, 'abort', xhr, options );
+	        ajaxHelpers.error( null, 'abort', xhr, options );
 	        return xhr;
 	    }
 
@@ -503,7 +501,7 @@
 	        abortTimer = setTimeout( function () {
 	            xhr.onreadystatechange = noop;
 	            xhr.abort();
-	            _ajaxHelpers.error( null, 'timeout', xhr, options );
+	            ajaxHelpers.error( null, 'timeout', xhr, options );
 	        }, options.timeout );
 	    }
 
@@ -512,13 +510,313 @@
 	    return xhr;
 	}
 
+	/**
+	 * Serialize data to string.
+	 *
+	 * @param options
+	 */
+	function serializeData( options ) {
+	    if ( options.data && type( options.data ) !== 'string' ) {
+	        options.data = param( options.data );
+	    }
+
+	    if ( options.data && options.type.toLocaleLowerCase() === 'get' ) {
+	        options.url  = appendQuery( options.url, options.data );
+	        options.data = undefined;
+	    }
+	}
+
+/***/ },
+/* 7 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var type    = __webpack_require__( 2 );
+	var noop    = __webpack_require__( 3 );
+	var forEach = __webpack_require__( 1 );
+	var extend  = Vue.util.extend;
+
+	var _mergeExceptUndefined = __webpack_require__( 8 );
+
+	var IS_CSS_RE = /\.css(?:\?|$)/i;
+
+	var _loadFileDefaultSetting = {
+	    url    : '',
+	    success: noop,
+	    error  : noop,
+	    props  : {}
+	};
+
+	/**
+	 *
+	 * 下载文件
+	 *
+	 *
+	 * e.g
+	 *
+	 *
+	 *      Args: url , onSuccess , onError , props
+	 *      1. loadFile(
+	 *                '//cdn.domain.cn/js/main.js' ,
+	 *              , function() { console.log('callBack') }
+	 *              , function() { console.log('Error happen!') }
+	 *              , { id: 'mainjs' }
+	 *         );
+	 *
+	 *
+	 *      Args: load a file list.
+	 *      2. loadFile( [
+	 *
+	 *          {
+	     *              url      : '//cdn.domain.cn/js/main.js',
+	     *              success  : function(){ console.log('callBack for url : //cdn.domain.cn/js/main.js ') },
+	     *              props    : {
+	     *                              id     : 'mainjs',
+	     *                              appKey : 'aJKckjkjdklaj2jJKssdIk'
+	     *                         }
+	     *          },
+	 *
+	 *          {
+	     *              url      : '//cdn.domain.cn/css/normalize.css',
+	     *              success  : function(){ console.log('callBack for url : //cdn.domain.cn/css/normalize.css ') }
+	     *          }
+	 *
+	 *      ] );
+	 *
+	 *
+	 *
+	 * @param filelist
+	 */
+	module.exports = function ( filelist ) {
+	    if ( 'array' !== type( filelist ) ) {
+	        filelist = _loadFileArgsParser( arguments.length, arguments );
+	    }
+
+	    forEach( filelist, function ( item, key ) {
+
+	        var temp = _mergeExceptUndefined(
+	            _loadFileDefaultSetting
+	            , item
+	        );
+
+	        _loadFile( temp.url, temp.success, temp.error, temp.props );
+
+	    } );
+	};
+
+
+	/**
+	 *
+	 *
+	 *
+	 * @param argsLength
+	 * @param arguments
+	 * @private
+	 */
+	function _loadFileArgsParser( length, args ) {
+
+	    // 1. url success error props
+	    // 2. url success error
+	    // 3. url success props
+	    // 4. url success
+	    // 5. url props
+	    // 6. url
+	    // 7. { url, success, error, props }
+
+	    var argsMapping = {
+	        /**
+	         *
+	         * {
+	             *      url,
+	             *      success,
+	             *      error,
+	             *      props
+	             * }
+	         *
+	         * or
+	         *
+	         * url
+	         *
+	         * @param args
+	         * @returns {object}
+	         */
+	        1: function ( args ) {
+
+	            if ( 'object' === type( args[0] ) ) {
+	                return args[0];
+	            }
+
+	            return {
+	                url: args[0]
+	            }
+	        },
+
+	        // url success || url props
+	        2: function ( args ) {
+
+	            var _type  = type( args[1] );
+	            var result = {
+	                url: args[0]
+	            };
+
+	            if ( 'function' === _type ) {
+	                result.success = args[1];
+	            } else {
+	                result.props = args[1];
+	            }
+
+	            return result;
+	        },
+
+	        // url success error || url success props
+	        3: function ( args ) {
+
+	            var _type  = type( args[2] );
+	            var result = {
+	                url    : args[0],
+	                success: args[1]
+	            };
+
+
+	            if ( 'function' === _type ) {
+	                result.error = args[2];
+	            } else {
+	                result.props = args[2];
+	            }
+
+	            return result;
+	        },
+
+	        // url success error props
+	        4: function ( args ) {
+	            return {
+	                url    : args[0],
+	                success: args[1],
+	                error  : args[2],
+	                props  : args[3]
+	            }
+	        }
+	    };
+
+	    return [argsMapping[length]( args )];
+	}
+
+
+	/**
+	 *
+	 * load file
+	 *
+	 * @param url
+	 * @param success
+	 * @param error
+	 * @param props
+	 * @private
+	 */
+	function _loadFile( url, success, error, props ) {
+
+	    var isCss        = IS_CSS_RE.test( url );
+	    var nodeName     = 'SCRIPT';
+	    var defaultProps = {
+	        type : 'text/javascript',
+	        async: true,
+	        src  : url
+	    };
+
+	    var header = document.head;
+
+	    if ( isCss ) {
+	        nodeName     = 'LINK';
+	        defaultProps = {
+	            rel : 'stylesheet',
+	            href: url
+	        }
+	    }
+
+	    var node = document.createElement( nodeName );
+
+	    // 合二为一
+	    node.onload = node.onerror = function ( event ) {
+	        (event.type === 'load') ? success( event ) : error( event );
+	        _clean( node );
+	        node = null;
+	    };
+
+	    extend(
+	        node,
+	        extend( props, defaultProps )
+	    );
+
+	    header.insertBefore( node, header.firstChild );
+
+	    function _clean( node ) {
+	        node.onload = node.onerror = null;
+
+	        // Css 文件在文档中被移除后，样式会更随丢失
+	        if ( isCss ) {
+	            return;
+	        }
+
+	        for ( var p in node ) {
+	            delete node[p];
+	        }
+
+	        header.removeChild( node );
+	    }
+	}
+
+/***/ },
+/* 8 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var forEach = __webpack_require__( 1 );
+
+	/**
+	 * 去掉undefined的属性
+	 * merge
+	 *
+	 * @param from
+	 * @param to
+	 * @returns {*}
+	 * @private
+	 */
+	module.exports = function ( from, to ) {
+	    forEach( from, function ( item, key ) {
+	        if ( to[key] === undefined ) {
+	            to[key] = item;
+	        }
+	    } );
+
+	    return to;
+	};
+
+/***/ },
+/* 9 */
+/***/ function(module, exports) {
+
+	/**
+	 * url后附加query string
+	 *
+	 * @param url
+	 * @param query
+	 * @returns {string}
+	 */
+	module.exports = function ( url, query ) {
+	    return (query === '') ? url : (url + '&' + query).replace( /[&?]{1,2}/, '?' );
+	}
+
+/***/ },
+/* 10 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var loadFile     = __webpack_require__( 7 );
+	var _ajaxHelpers = __webpack_require__( 11 );
+	var noop         = __webpack_require__( 3 );
 
 	/**
 	 * jsonp函数
 	 * @param options
 	 * @returns {*}
 	 */
-	function jsonPadding( options ) {
+	module.exports = function ( options ) {
 
 	    // 黑魔法~
 	    var callbackName = options.jsonpCallback || 'jsonp' + setTimeout( '1' );
@@ -552,67 +850,31 @@
 	        success: callBack,
 	        error  : callBack
 	    } );
-	}
-
-
-	/**
-	 * Serialize data to string.
-	 *
-	 * @param options
-	 */
-	function serializeData( options ) {
-	    if ( options.data && type( options.data ) !== 'string' ) {
-	        options.data = param( options.data );
-	    }
-
-	    if ( options.data && options.type.toLocaleLowerCase() === 'get' ) {
-	        options.url  = appendQuery( options.url, options.data );
-	        options.data = undefined;
-	    }
-	}
-
-/***/ },
-/* 7 */
-/***/ function(module, exports) {
-
-	/**
-	 * url后附加query string
-	 *
-	 * @param url
-	 * @param query
-	 * @returns {string}
-	 */
-	module.exports = function ( url, query ) {
-	    return (query === '') ? url : (url + '&' + query).replace( /[&?]{1,2}/, '?' );
-	}
-
-/***/ },
-/* 8 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var forEach = __webpack_require__( 1 );
-
-	/**
-	 * 去掉undefined的属性
-	 * merge
-	 *
-	 * @param from
-	 * @param to
-	 * @returns {*}
-	 * @private
-	 */
-	module.exports = function ( from, to ) {
-	    forEach( from, function ( item, key ) {
-	        if ( to[key] === undefined ) {
-	            to[key] = item;
-	        }
-	    } );
-
-	    return to;
 	};
 
 /***/ },
-/* 9 */
+/* 11 */
+/***/ function(module, exports) {
+
+	module.exports = {
+	    error     : function ( error, type, xhr, options ) {
+	        var context = options.context;
+	        options.error.call( context, xhr, type, error );
+	    },
+	    success   : function ( data, xhr, options ) {
+	        var context = options.context;
+	        options.success.call( context, data, 'success', xhr );
+	    },
+	    beforeSend: function ( xhr, options ) {
+	        var context = options.context;
+	        if ( options.beforeSend.call( context, xhr, options ) === false ) {
+	            return false;
+	        }
+	    }
+	};
+
+/***/ },
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var noop       = __webpack_require__( 3 );
@@ -642,7 +904,115 @@
 	};
 
 /***/ },
-/* 10 */
+/* 13 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var ajax        = __webpack_require__( 6 ).ajax;
+	var paramParser = __webpack_require__( 14 );
+
+	/**
+	 *
+	 *
+	 * Ajax, method 'get'.
+	 *
+	 * Vue.get( url [, data ] [, success(data, textStatus, XHR) ] [, dataType ] )
+	 *
+	 * @param url
+	 * @param data
+	 * @param success
+	 * @param dataType
+	 */
+	module.exports = function ( /* url, data, success, dataType */ ) {
+	    return ajax( paramParser.apply( null, arguments ) );
+	};
+
+/***/ },
+/* 14 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var type    = __webpack_require__( 2 );
+
+	/**
+	 *
+	 * override
+	 *
+	 * @param url
+	 * @param data
+	 * @param success
+	 * @param dataType
+	 * @returns {{Object}}
+	 */
+	module.exports = function ( url, data, success, dataType ) {
+
+	    if ( 'function' === type( data ) ) {
+	        dataType = success;
+	        success  = data;
+	        data     = undefined;
+	    }
+
+	    if ( 'function' !== type( success ) ) {
+	        dataType = success;
+	        success  = undefined;
+	    }
+
+	    return {
+	        url     : url,
+	        data    : data,
+	        success : success,
+	        dataType: dataType
+	    }
+	};
+
+/***/ },
+/* 15 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var ajax        = __webpack_require__( 6 ).ajax;
+	var paramParser = __webpack_require__( 14 );
+
+	/**
+	 *
+	 * Ajax, method 'post'.
+	 *
+	 * Vue.post( url [, data ] [, success(data, textStatus, XHR) ] [, dataType ] )
+	 *
+	 * @param url
+	 * @param data
+	 * @param success
+	 * @param dataType
+	 */
+	module.exports = function ( /* url, data, success, dataType */ ) {
+	    var options  = paramParser.apply( null, arguments );
+	    options.type = 'post';
+	    return ajax( options );
+	};
+
+/***/ },
+/* 16 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var ajax        = __webpack_require__( 6 ).ajax;
+	var paramParser = __webpack_require__( 14 );
+
+	/**
+	 *
+	 * Ajax, method 'JSON'.
+	 *
+	 * Vue.getJSON( url [, data ] [, success(data, textStatus, XHR) ] [, dataType ] )
+	 *
+	 * @param url
+	 * @param data
+	 * @param success
+	 * @param dataType
+	 */
+	module.exports = function ( /* url, data, success, dataType */ ) {
+	    var options      = paramParser.apply( null, arguments );
+	    options.dataType = 'json';
+	    return ajax( options );
+	};
+
+/***/ },
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* global module */
@@ -924,371 +1294,7 @@
 
 	module.exports = vQuery;
 
-/***/ },
-/* 11 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var ajax        = __webpack_require__( 6 ).ajax;
-	var paramParser = __webpack_require__( 12 );
-
-	/**
-	 *
-	 *
-	 * Ajax, method 'get'.
-	 *
-	 * Vue.get( url [, data ] [, success(data, textStatus, XHR) ] [, dataType ] )
-	 *
-	 * @param url
-	 * @param data
-	 * @param success
-	 * @param dataType
-	 */
-	module.exports = function ( /* url, data, success, dataType */ ) {
-	    return ajax( paramParser.apply( null, arguments ) );
-	};
-
-/***/ },
-/* 12 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var type    = __webpack_require__( 2 );
-
-	/**
-	 *
-	 * override
-	 *
-	 * @param url
-	 * @param data
-	 * @param success
-	 * @param dataType
-	 * @returns {{Object}}
-	 */
-	module.exports = function ( url, data, success, dataType ) {
-
-	    if ( 'function' === type( data ) ) {
-	        dataType = success;
-	        success  = data;
-	        data     = undefined;
-	    }
-
-	    if ( 'function' !== type( success ) ) {
-	        dataType = success;
-	        success  = undefined;
-	    }
-
-	    return {
-	        url     : url,
-	        data    : data,
-	        success : success,
-	        dataType: dataType
-	    }
-	};
-
-/***/ },
-/* 13 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var ajax        = __webpack_require__( 6 ).ajax;
-	var paramParser = __webpack_require__( 12 );
-
-	/**
-	 *
-	 * Ajax, method 'post'.
-	 *
-	 * Vue.post( url [, data ] [, success(data, textStatus, XHR) ] [, dataType ] )
-	 *
-	 * @param url
-	 * @param data
-	 * @param success
-	 * @param dataType
-	 */
-	module.exports = function ( /* url, data, success, dataType */ ) {
-	    var options  = paramParser.apply( null, arguments );
-	    options.type = 'post';
-	    return ajax( options );
-	};
-
-/***/ },
-/* 14 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var ajax        = __webpack_require__( 6 ).ajax;
-	var paramParser = __webpack_require__( 12 );
-
-	/**
-	 *
-	 * Ajax, method 'JSON'.
-	 *
-	 * Vue.getJSON( url [, data ] [, success(data, textStatus, XHR) ] [, dataType ] )
-	 *
-	 * @param url
-	 * @param data
-	 * @param success
-	 * @param dataType
-	 */
-	module.exports = function ( /* url, data, success, dataType */ ) {
-	    var options      = paramParser.apply( null, arguments );
-	    options.dataType = 'json';
-	    return ajax( options );
-	};
-
-/***/ },
-/* 15 */
-/***/ function(module, exports) {
-
-	module.exports = {
-	    error     : function ( error, type, xhr, options ) {
-	        var context = options.context;
-	        options.error.call( context, xhr, type, error );
-	    },
-	    success   : function ( data, xhr, options ) {
-	        var context = options.context;
-	        options.success.call( context, data, 'success', xhr );
-	    },
-	    beforeSend: function ( xhr, options ) {
-	        var context = options.context;
-	        if ( options.beforeSend.call( context, xhr, options ) === false ) {
-	            return false;
-	        }
-	    }
-	};
-
-/***/ },
-/* 16 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var type    = __webpack_require__( 2 );
-	var noop    = __webpack_require__( 3 );
-	var forEach = __webpack_require__( 1 );
-	var extend  = Vue.util.extend;
-
-	var _mergeExceptUndefined = __webpack_require__( 8 );
-
-	var IS_CSS_RE = /\.css(?:\?|$)/i;
-
-	var _loadFileDefaultSetting = {
-	    url    : '',
-	    success: noop,
-	    error  : noop,
-	    props  : {}
-	};
-
-	/**
-	 *
-	 * 下载文件
-	 *
-	 *
-	 * e.g
-	 *
-	 *
-	 *      Args: url , onSuccess , onError , props
-	 *      1. loadFile(
-	 *                '//cdn.domain.cn/js/main.js' ,
-	 *              , function() { console.log('callBack') }
-	 *              , function() { console.log('Error happen!') }
-	 *              , { id: 'mainjs' }
-	 *         );
-	 *
-	 *
-	 *      Args: load a file list.
-	 *      2. loadFile( [
-	 *
-	 *          {
-	     *              url      : '//cdn.domain.cn/js/main.js',
-	     *              success  : function(){ console.log('callBack for url : //cdn.domain.cn/js/main.js ') },
-	     *              props    : {
-	     *                              id     : 'mainjs',
-	     *                              appKey : 'aJKckjkjdklaj2jJKssdIk'
-	     *                         }
-	     *          },
-	 *
-	 *          {
-	     *              url      : '//cdn.domain.cn/css/normalize.css',
-	     *              success  : function(){ console.log('callBack for url : //cdn.domain.cn/css/normalize.css ') }
-	     *          }
-	 *
-	 *      ] );
-	 *
-	 *
-	 *
-	 * @param filelist
-	 */
-	module.exports = function ( filelist ) {
-	    if ( 'array' !== type( filelist ) ) {
-	        filelist = _loadFileArgsParser( arguments.length, arguments );
-	    }
-
-	    forEach( filelist, function ( item, key ) {
-
-	        var temp = _mergeExceptUndefined(
-	            _loadFileDefaultSetting
-	            , item
-	        );
-
-	        _loadFile( temp.url, temp.success, temp.error, temp.props );
-
-	    } );
-	};
-
-
-	/**
-	 *
-	 *
-	 *
-	 * @param argsLength
-	 * @param arguments
-	 * @private
-	 */
-	function _loadFileArgsParser( length, args ) {
-
-	    // 1. url success error props
-	    // 2. url success error
-	    // 3. url success props
-	    // 4. url success
-	    // 5. url props
-	    // 6. url
-	    // 7. { url, success, error, props }
-
-	    var argsMapping = {
-	        /**
-	         *
-	         * {
-	             *      url,
-	             *      success,
-	             *      error,
-	             *      props
-	             * }
-	         *
-	         * or
-	         *
-	         * url
-	         *
-	         * @param args
-	         * @returns {object}
-	         */
-	        1: function ( args ) {
-
-	            if ( 'object' === type( args[0] ) ) {
-	                return args[0];
-	            }
-
-	            return {
-	                url: args[0]
-	            }
-	        },
-
-	        // url success || url props
-	        2: function ( args ) {
-
-	            var _type  = type( args[1] );
-	            var result = {
-	                url: args[0]
-	            };
-
-	            if ( 'function' === _type ) {
-	                result.success = args[1];
-	            } else {
-	                result.props = args[1];
-	            }
-
-	            return result;
-	        },
-
-	        // url success error || url success props
-	        3: function ( args ) {
-
-	            var _type  = type( args[2] );
-	            var result = {
-	                url    : args[0],
-	                success: args[1]
-	            };
-
-
-	            if ( 'function' === _type ) {
-	                result.error = args[2];
-	            } else {
-	                result.props = args[2];
-	            }
-
-	            return result;
-	        },
-
-	        // url success error props
-	        4: function ( args ) {
-	            return {
-	                url    : args[0],
-	                success: args[1],
-	                error  : args[2],
-	                props  : args[3]
-	            }
-	        }
-	    };
-
-	    return [argsMapping[length]( args )];
-	}
-
-
-	/**
-	 *
-	 * load file
-	 *
-	 * @param url
-	 * @param success
-	 * @param error
-	 * @param props
-	 * @private
-	 */
-	function _loadFile( url, success, error, props ) {
-
-	    var isCss        = IS_CSS_RE.test( url );
-	    var nodeName     = 'SCRIPT';
-	    var defaultProps = {
-	        type : 'text/javascript',
-	        async: true,
-	        src  : url
-	    };
-
-	    var header = document.head;
-
-	    if ( isCss ) {
-	        nodeName     = 'LINK';
-	        defaultProps = {
-	            rel : 'stylesheet',
-	            href: url
-	        }
-	    }
-
-	    var node = document.createElement( nodeName );
-
-	    // 合二为一
-	    node.onload = node.onerror = function ( event ) {
-	        (event.type === 'load') ? success( event ) : error( event );
-	        _clean( node );
-	        node = null;
-	    };
-
-	    extend(
-	        node,
-	        extend( props, defaultProps )
-	    );
-
-	    header.insertBefore( node, header.firstChild );
-
-	    function _clean( node ) {
-	        node.onload = node.onerror = null;
-
-	        // Css 文件在文档中被移除后，样式会更随丢失
-	        if ( isCss ) {
-	            return;
-	        }
-
-	        for ( var p in node ) {
-	            delete node[p];
-	        }
-
-	        header.removeChild( node );
-	    }
-	}
-
 /***/ }
-/******/ ]);
+/******/ ])
+});
+;

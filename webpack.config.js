@@ -14,6 +14,7 @@ module.exports = {
     entry: './src/main.js',
     output: {
         path: './dist/',
+        libraryTarget: 'umd',
         filename: 'vue-plugin.js'
     },
     resolve: {
