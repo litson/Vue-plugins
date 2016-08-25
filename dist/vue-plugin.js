@@ -66,11 +66,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *               所以将插件放在信
 	 */
 
-	/* global module */
+	/* global module,Vue */
 	// ==================== Bound to global Vue ==================== //
 	'use strict';
 
-	Vue.use( {
+	var install = {
 	    install: function ( Vue ) {
 
 	        /**
@@ -94,15 +94,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	        Vue.ajax         = __webpack_require__( 6 ).ajax;
 
 	        // 变种函数
-	        Vue.get      = __webpack_require__( 13 );
-	        Vue.post     = __webpack_require__( 15 );
-	        Vue.getJSON  = __webpack_require__( 16 );
+	        // Vue.get      = require( './ajaxGet' );
+	        // Vue.post     = require( './ajaxPost' );
+	        // Vue.getJSON  = require( './ajaxGetJSON' );
 	        Vue.loadFile = __webpack_require__( 7 );
 
-
-	        Vue.$ = __webpack_require__( 17 );
+	        Vue.$ = __webpack_require__( 13 );
 	    }
-	} );
+	};
+
+	if ( window.Vue ) {
+	    Vue.use( install );
+	} else {
+	    module.exports = install;
+	}
 
 /***/ },
 /* 1 */
@@ -905,114 +910,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 13 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var ajax        = __webpack_require__( 6 ).ajax;
-	var paramParser = __webpack_require__( 14 );
-
-	/**
-	 *
-	 *
-	 * Ajax, method 'get'.
-	 *
-	 * Vue.get( url [, data ] [, success(data, textStatus, XHR) ] [, dataType ] )
-	 *
-	 * @param url
-	 * @param data
-	 * @param success
-	 * @param dataType
-	 */
-	module.exports = function ( /* url, data, success, dataType */ ) {
-	    return ajax( paramParser.apply( null, arguments ) );
-	};
-
-/***/ },
-/* 14 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var type    = __webpack_require__( 2 );
-
-	/**
-	 *
-	 * override
-	 *
-	 * @param url
-	 * @param data
-	 * @param success
-	 * @param dataType
-	 * @returns {{Object}}
-	 */
-	module.exports = function ( url, data, success, dataType ) {
-
-	    if ( 'function' === type( data ) ) {
-	        dataType = success;
-	        success  = data;
-	        data     = undefined;
-	    }
-
-	    if ( 'function' !== type( success ) ) {
-	        dataType = success;
-	        success  = undefined;
-	    }
-
-	    return {
-	        url     : url,
-	        data    : data,
-	        success : success,
-	        dataType: dataType
-	    }
-	};
-
-/***/ },
-/* 15 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var ajax        = __webpack_require__( 6 ).ajax;
-	var paramParser = __webpack_require__( 14 );
-
-	/**
-	 *
-	 * Ajax, method 'post'.
-	 *
-	 * Vue.post( url [, data ] [, success(data, textStatus, XHR) ] [, dataType ] )
-	 *
-	 * @param url
-	 * @param data
-	 * @param success
-	 * @param dataType
-	 */
-	module.exports = function ( /* url, data, success, dataType */ ) {
-	    var options  = paramParser.apply( null, arguments );
-	    options.type = 'post';
-	    return ajax( options );
-	};
-
-/***/ },
-/* 16 */
-/***/ function(module, exports, __webpack_require__) {
-
-	var ajax        = __webpack_require__( 6 ).ajax;
-	var paramParser = __webpack_require__( 14 );
-
-	/**
-	 *
-	 * Ajax, method 'JSON'.
-	 *
-	 * Vue.getJSON( url [, data ] [, success(data, textStatus, XHR) ] [, dataType ] )
-	 *
-	 * @param url
-	 * @param data
-	 * @param success
-	 * @param dataType
-	 */
-	module.exports = function ( /* url, data, success, dataType */ ) {
-	    var options      = paramParser.apply( null, arguments );
-	    options.dataType = 'json';
-	    return ajax( options );
-	};
-
-/***/ },
-/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* global module */

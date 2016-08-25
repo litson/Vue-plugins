@@ -10,11 +10,11 @@
  *               所以将插件放在信
  */
 
-/* global module */
+/* global module,Vue */
 // ==================== Bound to global Vue ==================== //
 'use strict';
 
-Vue.use( {
+var install = {
     install: function ( Vue ) {
 
         /**
@@ -38,12 +38,17 @@ Vue.use( {
         Vue.ajax         = require( './ajax' ).ajax;
 
         // 变种函数
-        Vue.get      = require( './ajaxGet' );
-        Vue.post     = require( './ajaxPost' );
-        Vue.getJSON  = require( './ajaxGetJSON' );
+        // Vue.get      = require( './ajaxGet' );
+        // Vue.post     = require( './ajaxPost' );
+        // Vue.getJSON  = require( './ajaxGetJSON' );
         Vue.loadFile = require( './loadFile' );
-
 
         Vue.$ = require( './Vue.$' );
     }
-} );
+};
+
+if ( window.Vue ) {
+    Vue.use( install );
+} else {
+    module.exports = install;
+}
